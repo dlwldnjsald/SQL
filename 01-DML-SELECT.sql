@@ -33,7 +33,7 @@ SELECT 3.14159 * 10 * 10 FROM dual;
 --특정 컬럼의 값(ex. salary*12 부분)을 산술 연산에 포함시키고자 할 경우,
 SELECT first_name, salary, salary*12 FROM employees;
 
---아래에서 오류가 나는 원인: job_id는 문자열 데이터(VARCHAR2)이기 때문에 산술연산 불가
+--아래에서 오류가 나는 원인: job_id는 문자열 데이터(VARCHAR2)이기 때문에 산술연산 불가함
 SELECT first_name, job_ id, job_id * 12 FROM employees;
 DESC employees;
 
