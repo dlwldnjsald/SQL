@@ -186,12 +186,17 @@ WHERE first_name LIKE '_a__';
 -- 부서 id가 90인 사원 중, 급여가 20000이상인 사원 출력
 SELECT first_name , department_id , salary
 FROM employees
-WHERE department_id = 90 AND salary > 20000;
+WHERE department_id = 90 AND salary >= 20000; --2개의 조건을 동시 만족하기위해 AND
 
 -- 입사일이 11/01/01 ~ 17/12/31 구간에 있는 사원의 목록
+--1. 비교조합
 SELECT first_name, hire_date
 FROM employees
-WHERE hire_date between '11/01/01' AND '17/12/31';
+WHERE hire_date >='11/01/01' AND hire_date <='17/12/31';
+--2. BETWEEN 연산자 이용
+SELECT first_name, hire_date
+FROM employees
+WHERE hire_date BETWEEN '11/01/01' AND '17/12/31';
 
 -- manager_id  가 100,120,147인 사원의 명단
 --1. 비교연산자+논리연산자의 조합
