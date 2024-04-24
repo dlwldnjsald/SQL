@@ -124,4 +124,82 @@ WHERE salary <= 4000 OR salary >=17000;    --OR 논리합 둘중 하나가 참�
 -- 급여가 14000 이상이고 ,17000 미만인 사원의 이름과 급여 출력
 SELECT first_name, salary 
 FROM employees
-WHERE salary >= 14000 AND salary < 17000;
+WHERE salary >= 14000 AND salary < 17000;   --AND 논리곱 연산자 사용
+
+-- 급여가 14000 이상이고 ,17000 이하인 사원의 이름과 급여 출력
+-- BETWEEEN 연산자: 범위 비교할 경우//--이상 --이하 
+SELECT first_name, salary 
+FROM employees
+WHERE salary BETWEEN 14000 AND 17000;    
+ 
+ 
+-- NULL 체크 =, <> 사용하면 안됨
+--IS NULL, IS NOT NULL 
+
+-- commission을 받지 않는 사람들 데이터가 비어있는(null)인 사람들 출력
+SELECT first_name,commission_pct
+FROM employees
+WHERE commission_pct IS NULL;  --NULL CHECK
+
+-- commission을 받는 사람들 데이터가 (null)이 아닌 사람들 출력
+SELECT first_name,commission_pct
+FROM employees
+WHERE commission_pct IS NOT NULL;  -- NOTNULL CHECK
+ 
+ 
+-- IN연산자: 특정 집합의 요소와 비교
+-- 사원들 중 10,20,40 번 부서에서 근무하는 직원들의 이름과 부서아이디
+-- 위의 3개의 조건 중 하나만 만족하면 되는것으로 출력이 될것임 10이거나 20이거나 40이거나 ..
+SELECT first_name,department_id
+FROM employees
+--WHERE department_id =10 OR department_id =20 OR department_id =40; 이렇게 대신 아래처럼도 가능
+WHERE department_id IN(10,20,40);
+
+
+-- LIKE연산
+-- 와일드카드(%, _)를 이용한 부분 문자열 매핑
+-- % : 0개 이상의 정해지지 않은 문자열
+-- _ : 1개의 정해지지 않은 문자열
+
+-- 이름에 am을 포함하고 있는 사원의 이름과 급여 출력
+SELECT first_name,salary
+FROM employees
+WHERE LOWER(first_name) LIKE '%am%';    --소문자로 다 변경후 am 앞뒤로 뭐가 오든 상관없이 출력
+
+-- 이름의 두번째 글자가 a인 사원의 이름과 급여 출력
+SELECT first_name,salary
+FROM employees
+WHERE LOWER(first_name)
+LIKE '_a%';                --두번째 글자를 _언더바 사용해서 입력세팅후 그뒤로 뭐가 오든 상관없이 출력
+
+-- 이름의 4번째 글자가 a인 사원의 이름과 급여 
+SELECT first_name,salary
+FROM employees
+WHERE LOWER(first_name)
+LIKE '___a%';    
+
+-- 이름이 네글자인 사원들 중에서 두번째 글자가 a인 사원의 이름과 급여
+SELECT first_name,salary
+FROM employees 
+WHERE first_name LIKE '_a__';
+
+-- 부서 id가 90인 사원 중, 급여가 20000이상인 사원 출력
+SELECT first_name , department_id , salary
+FROM employees
+WHERE department_id = 90 AND salary > 20000;
+
+-- 입사일이 11/01/01 ~ 17/12/31 구간에 있는 사원의 목록
+SELECT first_name, hire_date
+FROM employees
+WHERE hire_date between '11/01/01' AND '17/12/31';
+
+-- manager_id  가 100,120,147인 사원의 명단
+--1. 비교연산자+논리연산자의 조합
+SELECT first_name, manager_id
+FROM employees
+WHERE manager_id = 100 OR manager_id = 120 OR manager_id = 147;
+--2. In 연산자 이용
+SELECT first_name, manager_id
+FROM employees
+WHERE manager_id IN(100,120,147);
+-- 두 쿼리 비교하자
