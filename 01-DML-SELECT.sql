@@ -37,3 +37,17 @@ SELECT first_name, salary, salary*12 FROM employees;
 SELECT first_name, job_ id, job_id * 12 FROM employees;
 DESC employees;
 
+--0424강의문
+--NULL 
+--이름,급여, 커미션 비율을 출력
+SELECT first_name, salary, commission_pct FROM employees;
+
+--이름, 커미션 까지 포함한 급여를 출력할 경우 
+--널이 포함된 연산식의 결과는 null이다
+--null을 처리하기 위한 함수 NVL이 필요
+SELECT first_name, salary, commission_pct, salary + salary * commission_pct FROM employees;
+--NVL(표현식1, 표현식1일이 널일 경우의 대체값)으로 표현해준다
+SELECT first_name, salary, commission_pct, salary+salary * NVL(commission_pct,0) FROM employees;
+
+--NULL은 0이나 "" 와 다르게 빈 값이다.
+--NULL은 산술연산 결과, 통계 결과를 왜곡,-> NULL에 대한 처리는 철저하게!
