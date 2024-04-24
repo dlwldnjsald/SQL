@@ -37,17 +37,57 @@ SELECT first_name, salary, salary*12 FROM employees;
 SELECT first_name, job_ id, job_id * 12 FROM employees;
 DESC employees;
 
---0424강의문
---NULL 
---이름,급여, 커미션 비율을 출력
+
+-- 0424강의문
+-- NULL 
+-- 이름,급여, 커미션 비율을 출력
 SELECT first_name, salary, commission_pct FROM employees;
 
---이름, 커미션 까지 포함한 급여를 출력할 경우 
---널이 포함된 연산식의 결과는 null이다
---null을 처리하기 위한 함수 NVL이 필요
+-- 이름, 커미션 까지 포함한 급여를 출력할 경우 
+-- 널이 포함된 연산식의 결과는 null이다
 SELECT first_name, salary, commission_pct, salary + salary * commission_pct FROM employees;
---NVL(표현식1, 표현식1일이 널일 경우의 대체값)으로 표현해준다
+-- null을 처리하기 위한 함수 NVL이 필요
+-- NVL(표현식1, 표현식1일이 널일 경우의 대체값)으로 표현해준다
 SELECT first_name, salary, commission_pct, salary+salary * NVL(commission_pct,0) FROM employees;
 
---NULL은 0이나 "" 와 다르게 빈 값이다.
---NULL은 산술연산 결과, 통계 결과를 왜곡,-> NULL에 대한 처리는 철저하게!
+-- NULL은 0이나 "" 와 다르게 빈 값이다.
+-- NULL은 산술연산 결과, 통계 결과를 왜곡,-> NULL에 대한 처리는 철저하게!
+
+
+-- 별칭 Alias
+-- projection 단계에서 출력용으로 표시되는 임시 컬럼 제목
+
+-- 컬럼명 뒤에 별칭
+-- 컬럼명 뒤에 as 별칭
+-- 표시명에 특수문자나 공백이 포함된 경우 "" 쌍따옴표로 묶어서 부여
+
+-- 1.employees에 있는 컬럼값 확인
+-- 2.직원 아이디, 이름, 급여 출력
+-- 3.직원 아이디는 empNo, 이름은 f-name, 급여는 월 급으로 표시
+desc employees;
+SELECT employee_id, first_name, salary FROM employees;
+SELECT employee_id empNo, first_name as "f-name", salary "월 급" FROM employees;
+
+-- 4. 직원이름(first_name last_name을 합쳐서) name으로 출력,
+-- 급여 (커미션이 포함된 급여), 급여*12 연봉 별칭으로 표기할 경우
+SELECT first_name + last_name, salary + salary* nvl(commission_pct,0),salary*12 FROM employees;
+SELECT first_name || ' ' || last_name, salary + salary* nvl(commission_pct,0),salary*12 FROM employees;
+SELECT first_name || ' ' || last_name "Full Name",       --문자열 합치기는 || 사용
+salary + salary* nvl(commission_pct,0)"급여(커미션포함)",
+salary*12 연봉 
+FROM employees;
+
+-- 연습 : Alias 붙이기( employees 테이블)
+-- 이름: first_name last_name
+-- 입사일: hire_date
+-- 전화번호: phone_number
+-- 급여: salary
+-- 연봉: salary* 12
+
+SELECT first_name|| ' ' || last_name 이름, 
+hire_date 입사일, 
+phone_number as 전화번호, 
+salary 급여, 
+salary*12 연봉 
+FROM employees;
+
