@@ -208,3 +208,31 @@ SELECT first_name, manager_id
 FROM employees
 WHERE manager_id IN(100,120,147);
 -- 두 쿼리 비교하자
+
+
+
+-- ORDER BY 
+-- 특정 컬럼명, 연산식, 별칭, 혹은 컬럼 순서를 기준으로 레코드 정렬
+-- ASC (오름차순:DEFAULT), DESC(내림차순)
+-- 여러개의 컬럼에 적용할 수 있고 ,로 구분한다
+-- 정렬기준을 어떻게 세우느냐에 따라 성능, 출력결과에 영향을 미칠 수 있다
+
+-- 부서 번호의 오름차순으로 정렬, 부서번호와 급여, 이름을 출력
+SELECT department_id, salary, first_name
+FROM employees
+ORDER BY department_id; 
+--asc 디폴트값이라 생략가능
+
+-- 급여가 10000 이상인 직원 대상, 급여의 내림차순으로 출력, 이름, 급여
+SELECT first_name, salary
+FROM employees
+WHERE salary >= 10000
+ORDER BY salary DESC;
+
+-- 부서 번호, 급여, 이름순으로 출력하고 정렬기준은 부서번호 오름차순, 급여 내림차순
+SELECT department_id "부서 번호", salary 급여, first_name 이름
+FROM employees
+ORDER BY department_id ,salary DESC;
+
+
+
