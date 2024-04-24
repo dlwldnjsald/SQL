@@ -1,3 +1,4 @@
+--0423 강의문
 --SQL 문장의 주석
 -- 마지막에 세미콜론(;)으로 끝난다
 -- 키워드들은 대소문자 구분하지 않는다
@@ -38,7 +39,7 @@ SELECT first_name, job_ id, job_id * 12 FROM employees;
 DESC employees;
 
 
--- 0424강의문
+-- 0424강의문-------------------------------------------------------------------
 -- NULL 
 -- 이름,급여, 커미션 비율을 출력
 SELECT first_name, salary, commission_pct FROM employees;
@@ -72,11 +73,13 @@ SELECT employee_id empNo, first_name as "f-name", salary "월 급" FROM employee
 -- 급여 (커미션이 포함된 급여), 급여*12 연봉 별칭으로 표기할 경우
 SELECT first_name + last_name, salary + salary* nvl(commission_pct,0),salary*12 FROM employees;
 SELECT first_name || ' ' || last_name, salary + salary* nvl(commission_pct,0),salary*12 FROM employees;
-SELECT first_name || ' ' || last_name "Full Name",       --문자열 합치기는 || 사용
-salary + salary* nvl(commission_pct,0)"급여(커미션포함)",
-salary*12 연봉 
+SELECT 
+    first_name || ' ' || last_name "Full Name",       --문자열 합치기는 || 사용
+    salary + salary* nvl(commission_pct,0)"급여(커미션포함)",
+    salary*12 연봉 
 FROM employees;
 
+--PROJECTION기능 위해 사용된 SELECT문
 -- 연습 : Alias 붙이기( employees 테이블)
 -- 이름: first_name last_name
 -- 입사일: hire_date
@@ -84,10 +87,41 @@ FROM employees;
 -- 급여: salary
 -- 연봉: salary* 12
 
-SELECT first_name|| ' ' || last_name 이름, 
-hire_date 입사일, 
-phone_number as 전화번호, 
-salary 급여, 
-salary*12 연봉 
+SELECT 
+    first_name|| ' ' || last_name 이름, 
+    hire_date 입사일, 
+    phone_number as 전화번호, 
+    salary 급여, 
+    salary*12 연봉 
 FROM employees;
 
+
+-- SELECTION기능을 위한 WHERE문 사용
+-- 특정 조건을 기준으로 레코드를 선택한다(SELECTION)
+-- salary>10000조건을 포함한 출력방법 
+-- 키워드들의 순서가 중요하다
+SELECT * FROM employees;             -- 출력 ALL, FROM employees
+SELECT first_name 이름, salary 월급   -- first_name, salary만 셀렉트
+FROM employees                       -- employees 테이블 내에서 출력
+WHERE salary>10000;                  -- 조건문 where이하 사용
+
+-- 비교 연산: =, <>, >, >=, <, <= 연습하기
+-- 사원들 중, 급여가 15000 이상인 직원의 이름과 급여 출력
+SELECT first_name, salary 
+FROM employees
+WHERE salary>15000;
+
+-- 입사일이 17/01/01 이후인 직원들의 이름과 입사일 출력
+SELECT first_name, hire_date 
+FROM employees
+WHERE hire_date >= '17/01/01';
+
+-- 급여가 4000 이하이거나 17000 이상인 사원의 이름과 급여 출력
+SELECT first_name, salary 
+FROM employees
+WHERE salary <= 4000 OR salary >=17000;    --OR 논리합 둘중 하나가 참이면 참이다
+
+-- 급여가 14000 이상이고 ,17000 미만인 사원의 이름과 급여 출력
+SELECT first_name, salary 
+FROM employees
+WHERE salary >= 14000 AND salary < 17000;
