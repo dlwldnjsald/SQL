@@ -251,15 +251,36 @@ FROM employees
 ORDER BY job_id,salary DESC;
 
 -- 3. 문제
--- 담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 직원의 이름, 매니저
-아이디, 커미션 비율, 월급 을 출력하세요.
+-- 담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 
+--직원의 이름, 매니저아이디, 커미션 비율, 월급 을 출력하세요.
+SELECT first_name, manager_id, commission_pct, salary
+FROM employees
+WHERE commission_pct is NULL WHERE salary >3000;
 -----------------------------------------
 
 -- 0425 강의문------------------------------------------------------------------
 -- 단일행 함수 SINGLE-ROW FUNCTION 
 -- 단일 레코드를 기준으로 특정 컬럼에 값에 적용되는 함수
 
--- 문자열 단일행 함수
-SELECT first_name, last_name
+-- 문자열 단일행 함수의 여러가지 방법
+SELECT first_name, last_name,
+    CONCAT(first_name, CONCAT(' ', last_name)),     --1.CONCAT 문자열연결함수
+    first_name || ' ' || last_name,                 --2.|| 문자열 연결 연산자
+    INITCAP(first_name || ' ' || last_name)         --3. 각 단어의 첫글자 대문자
 FROM employees;
+
+SELECT first_name, last_name,
+    LOWER(first_name),          --모두 소문자
+    UPPER(first_name),          --모두 대문자
+    LPAD(first_name, 20, '*'),  -- 왼쪽 빈자리 채움
+    RPAD(first_name, 20, '*')   -- 오른쪽 빈자리 채움
+FROM employees;
+    
+SELECT'     Oracle     ',
+        '*****Database*****',
+        LTRIM('     Oracle     '), -- 왼쪽의 빈공간 삭제
+        RTRIM('     Oracle     '), -- 오른쪽의 빈공간 삭제
+        TRIM('*' FROM '*****Database*****'),    -- 앞뒤의 잡음 문자 제거
+        SUBSTR('Oracle Database', 8, 4) 
+FROM dual;
 
