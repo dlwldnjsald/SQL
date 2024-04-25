@@ -270,11 +270,10 @@ ORDER BY salary DESC;
 
 -- 5. 문제
 -- 월급이 14000 미만 10000 이상인 직원의 이름(first_name), 월급, 커미션퍼센트 를 
--- 월급순(내림차순) 출력하세오. 단 커미션퍼센트 가 null 이면 0 으로 나타내시오
-SELECT first_name, salary, commission_pct
+-- 월급순(내림차순) 출력하세오. 단 커미션퍼센트 가 null 이면 0 으로 나타내시오 nvl(commission_pct,0)
+SELECT first_name, salary , nvl(commission_pct,0)
 FROM employees
 where salary <14000 OR salary>=10000 
-AND commission_pct IS NULL LIKE "%0%"
 ORDER BY salary DESC;
 
 
@@ -326,23 +325,21 @@ SELECT 3.14159,
     POWER(2,4)         -- 2의 4제곱
 FROM dual;
 
+
 ---------------------------
 --DATE FORMAT
 ---------------------------
 -- 현재 세션 정보 확인
 SELECT * FROM nls_session_parameters;
 
-
 -- 현재 날짜 포맷이 어떻게 되는가 확인작업 하기 
 -- system으로 위에 바꾸고 딕셔너리를 확인하기
 -- SESSION->현재 접속된 사용자의 환경 정보를 뜻함
 SELECT value FROM nls_session_parameters    --환경변수를 담고있는 세션 환경에 관련된 값들 중에서
 WHERE parameter = 'NLS_DATE_FORMAT';        --파라미터명이 '' 이것인 값을 확인해본것 
--- RR TYPE으로 되있는것알수있음
+-- DATE FORMAT확인시-> RR TYPE으로 되있는것알수있음
 
 ---------------------------
- 
- 
 -- 현재 날짜 : SYSDATE
 SELECT sysdate 
 FROM dual;           -- 가상 테이블 dual로부터 받아오므로 1개의 레코드 존재
@@ -350,14 +347,59 @@ FROM dual;           -- 가상 테이블 dual로부터 받아오므로 1개의 �
 SELECT sysdate 
 FROM employees;      -- employees테이블로부터 받아오므로 employees 테이블 레코드의 갯수만큼 출력
 
-
 -- 날짜 관련 단일행 함수
 SELECT sysdate,
     ADD_MONTHS(sysdate, 2),                 -- 2개월 지난후의 날짜
     LAST_DAY(sysdate),                      -- 현재 달의 마지막 날짜
     MONTHS_BETWEEN('12/09/24', sysdate),    -- 두 날짜 사이에 개월 차
-    NEXT_DAY(sysdate,'금'),                  -- 현시점 이후 금요일의
-    NEXT_DAY(sysdate,6),                    -- ?일,월,화,수,목,금,토 1-7까지숫자/현재시점이후 해당요일의 날짜출력됨
+    NEXT_DAY(sysdate,'금'),                  -- 현시점 이후 금요일의 요일 출력
+    NEXT_DAY(sysdate,6),                    -- 1:SUN-7:SAT/현재시점이후 해당요일의 날짜 출력
     ROUND(sysdate, 'MONTH'),                -- MONTH를 기준으로 반올림
     TRUNC(sysdate, 'MONTH')                 -- MONTH를 기준으로 버림
 FROM dual;
+
+SELECT first_name, hire_date, 
+    ROUND(MONTHS_BETWEEN(sysdate, hire_date)) as 근속월수
+FROM employees;
+
+
+-- 변환 함수
+-- 1,TO NUMBER(s, fmt) : 문자열 -> 숫자
+-- 2,TO_DATE(s, fmt) : 문자열 -> 날짜
+-- 3,TO_CHAR(0, fmt) : 숫자, 날짜 -> 문자열
+
+--------------------------------
+-- TO_CHAR : 숫자, 날짜 -> 문자열
+-- 입사일을 yy-mm-dd형식으로 출력
+SELECT first_name, 
+        TO_CHAR(hire_date, 'YYYY-MM-DD') -- yy-mm-dd
+FROM employees;
+
+-- 현재 시간을 년-월-일 시:분:초로 출력
+SELECT SYSDATE,
+        TO_CHAR(sysdate, 'YYYY-MM-DD HH:MI:SS')
+FROM DUAL;
+
+-- 숫자를 화폐단위로 출력
+SELECT  
+        TO_CHAR(3000000, 'L999,999,999.99') -- L은 화폐단위 콤마표시로 구분 .00(달러표시의 .)
+FROM DUAL;
+
+-- 모든 직원의 이름, 월급, 연봉 정보(숫자->문자열 달러표시해서) 출력해보기
+SELECT first_name, salary, commission_pct,
+        TO_CHAR((salary + salary * nvl(commission_pct,0))*12, '$999,999.99') 연봉    
+        --nvl(commission_pct,0):cpct가 널이면 0으로 해준단뜻
+        --TO_CHAR 함수를 사용해서 숫자->문자열 달러표시로 변환해주는 함수 사용됨
+FROM employees;
+
+-----------------------------------
+-- TO NUMBER(s, fmt) : 문자열 -> 숫자
+SELECT '$57,600',
+    TO_NUMBER('$57,600', '$999,999') "TO_NUMBER",
+    TO_NUMBER('$57,600', '$999,999') / 12 월급
+FROM DUAL;
+
+-- TO NUMBER(s, fmt) :문자열 -> 날짜
+SELECT '2012-09-24 13:48:00',
+    TO_DATE('2012-09-24 13:48:00', 'YYYY-MM-DD HH24:MI:SS') TO_DATE
+FROM DUAL;
