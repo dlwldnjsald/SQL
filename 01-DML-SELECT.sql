@@ -236,6 +236,7 @@ ORDER BY department_id ,salary DESC;
 
 ----------------------------------------
 --practice 01.
+----------------------------------------
 -- 1.문제
 -- 정렬-> 입사일의 올림차순으로 가장 선임부터 출력이 되도록 
 -- 이름, 월급, 전번, 입사일 순서로 출력하고 
@@ -246,27 +247,51 @@ ORDER BY hire_date;
 
 -- 2. 문제
 -- 업무(jobs)별로 업무이름(job_title)과 최고월급(max_salary)을 월급의 내림차순(DESC)로 정렬
-SELECT  first_name, job_id, salary
+SELECT job_id job_title, salary max_salary
 FROM employees
 ORDER BY job_id,salary DESC;
 
 -- 3. 문제
 -- 담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 
---직원의 이름, 매니저아이디, 커미션 비율, 월급 을 출력하세요.
+-- 직원의 이름, 매니저아이디, 커미션 비율, 월급 을 출력하세요.
 SELECT first_name, manager_id, commission_pct, salary
 FROM employees
-WHERE commission_pct is NULL WHERE salary >3000;
------------------------------------------
+WHERE manager_id IS NOT NULL 
+AND commission_pct is NULL 
+AND salary > 3000;
+
+-- 4. 문제 
+-- 최고월급(max_salary)이 10000 이상인 업무의 이름(job_title)과 
+-- 최고월급(max_salary)을 최고월급의(max_salary) 내림차순(DESC)로 정렬하여 출력하세요.
+SELECT job_id "job_title", salary "max_salary"
+FROM employees
+WHERE salary > 10000
+ORDER BY salary DESC;
+
+-- 5. 문제
+-- 월급이 14000 미만 10000 이상인 직원의 이름(first_name), 월급, 커미션퍼센트 를 
+-- 월급순(내림차순) 출력하세오. 단 커미션퍼센트 가 null 이면 0 으로 나타내시오
+SELECT first_name, salary, commission_pct
+FROM employees
+where salary <14000 OR salary>=10000 
+AND commission_pct IS NULL LIKE "%0%"
+ORDER BY salary DESC;
+
+
+
+
+--------------------------------------
 
 -- 0425 강의문------------------------------------------------------------------
 -- 단일행 함수 SINGLE-ROW FUNCTION 
 -- 단일 레코드를 기준으로 특정 컬럼에 값에 적용되는 함수
 
+
 -- 문자열 단일행 함수의 여러가지 방법
 SELECT first_name, last_name,
-    CONCAT(first_name, CONCAT(' ', last_name)),     --1.CONCAT 문자열연결함수
-    first_name || ' ' || last_name,                 --2.|| 문자열 연결 연산자
-    INITCAP(first_name || ' ' || last_name)         --3. 각 단어의 첫글자 대문자
+    CONCAT(first_name, CONCAT(' ', last_name)),     -- CONCAT 문자열연결함수
+    first_name || ' ' || last_name,                 -- || 문자열 연결 연산자
+    INITCAP(first_name || ' ' || last_name)         -- 각 단어의 첫글자 대문자
 FROM employees;
 
 SELECT first_name, last_name,
@@ -276,11 +301,63 @@ SELECT first_name, last_name,
     RPAD(first_name, 20, '*')   -- 오른쪽 빈자리 채움
 FROM employees;
     
-SELECT'     Oracle     ',
+SELECT '    Oracle    ',
         '*****Database*****',
-        LTRIM('     Oracle     '), -- 왼쪽의 빈공간 삭제
-        RTRIM('     Oracle     '), -- 오른쪽의 빈공간 삭제
+        LTRIM('    Oracle    '), -- 왼쪽의 빈공간 삭제
+        RTRIM('    Oracle    '), -- 오른쪽의 빈공간 삭제
         TRIM('*' FROM '*****Database*****'),    -- 앞뒤의 잡음 문자 제거
-        SUBSTR('Oracle Database', 8, 4) 
+        SUBSTR('Oracle Database', 8, 4),         -- 부분 문자열
+        SUBSTR('Oracle Database', -8, 4),        -- 역인덱스 이용 부분 문자열
+        LENGTH('Oracle Database')                -- 문자열 길이
 FROM dual;
 
+
+-- 수치형 단일행 함수
+SELECT 3.14159,
+    ABS(-3.14),         -- 절대값 함수
+    CEIL(3.14),         -- 올림 함수
+    FLOOR(3.14),        -- 버림 함수   
+    ROUND(3.5),         -- 반올림 함수    
+    ROUND(3.14159,3),   -- 반올림 함수,소수점3째 자리까지 반올림 (실제 4째자리에서 반올림)
+    TRUNC(3.5),         -- 버림 함수
+    TRUNC(3.14159, 3),  -- 버림 함수, 소수점4째 자리에서 버림
+    SIGN(-3.14159),     -- 부호 함수(-1: 음수, 0:0, 1:양수)
+    MOD(7,3),          -- 7을 3으로 나눈 나머지
+    POWER(2,4)         -- 2의 4제곱
+FROM dual;
+
+---------------------------
+--DATE FORMAT
+---------------------------
+-- 현재 세션 정보 확인
+SELECT * FROM nls_session_parameters;
+
+
+-- 현재 날짜 포맷이 어떻게 되는가 확인작업 하기 
+-- system으로 위에 바꾸고 딕셔너리를 확인하기
+-- SESSION->현재 접속된 사용자의 환경 정보를 뜻함
+SELECT value FROM nls_session_parameters    --환경변수를 담고있는 세션 환경에 관련된 값들 중에서
+WHERE parameter = 'NLS_DATE_FORMAT';        --파라미터명이 '' 이것인 값을 확인해본것 
+-- RR TYPE으로 되있는것알수있음
+
+---------------------------
+ 
+ 
+-- 현재 날짜 : SYSDATE
+SELECT sysdate 
+FROM dual;           -- 가상 테이블 dual로부터 받아오므로 1개의 레코드 존재
+
+SELECT sysdate 
+FROM employees;      -- employees테이블로부터 받아오므로 employees 테이블 레코드의 갯수만큼 출력
+
+
+-- 날짜 관련 단일행 함수
+SELECT sysdate,
+    ADD_MONTHS(sysdate, 2),                 -- 2개월 지난후의 날짜
+    LAST_DAY(sysdate),                      -- 현재 달의 마지막 날짜
+    MONTHS_BETWEEN('12/09/24', sysdate),    -- 두 날짜 사이에 개월 차
+    NEXT_DAY(sysdate,'금'),                  -- 현시점 이후 금요일의
+    NEXT_DAY(sysdate,6),                    -- ?일,월,화,수,목,금,토 1-7까지숫자/현재시점이후 해당요일의 날짜출력됨
+    ROUND(sysdate, 'MONTH'),                -- MONTH를 기준으로 반올림
+    TRUNC(sysdate, 'MONTH')                 -- MONTH를 기준으로 버림
+FROM dual;
