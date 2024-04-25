@@ -234,5 +234,32 @@ SELECT department_id "부서 번호", salary 급여, first_name 이름
 FROM employees
 ORDER BY department_id ,salary DESC;
 
+----------------------------------------
+--practice 01.
+-- 1.문제
+-- 정렬-> 입사일의 올림차순으로 가장 선임부터 출력이 되도록 
+-- 이름, 월급, 전번, 입사일 순서로 출력하고 
+-- 이름, 월급, 전화번호, 입사일로 컬럼이름 대체
+SELECT first_name 이름, salary 월급, phone_number 전화번호, hire_date 입사일
+FROM employees
+ORDER BY hire_date;
 
+-- 2. 문제
+-- 업무(jobs)별로 업무이름(job_title)과 최고월급(max_salary)을 월급의 내림차순(DESC)로 정렬
+SELECT  first_name, job_id, salary
+FROM employees
+ORDER BY job_id,salary DESC;
+
+-- 3. 문제
+-- 담당 매니저가 배정되어있으나 커미션비율이 없고, 월급이 3000초과인 직원의 이름, 매니저
+아이디, 커미션 비율, 월급 을 출력하세요.
+-----------------------------------------
+
+-- 0425 강의문------------------------------------------------------------------
+-- 단일행 함수 SINGLE-ROW FUNCTION 
+-- 단일 레코드를 기준으로 특정 컬럼에 값에 적용되는 함수
+
+-- 문자열 단일행 함수
+SELECT first_name, last_name
+FROM employees;
 
