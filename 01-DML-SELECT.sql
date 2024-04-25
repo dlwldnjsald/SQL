@@ -341,7 +341,7 @@ FROM DUAL;
 -- 모든 직원의 이름, 월급, 연봉 정보(숫자->문자열 달러표시해서) 출력해보기
 SELECT first_name, salary, commission_pct,
         TO_CHAR((salary + salary * nvl(commission_pct,0))*12, '$999,999.99') 연봉    
-        --nvl(commission_pct,0):cpct가 널이면 0으로 해준단뜻
+        --nvl(commission_pct,0): 널이면 0으로 해준단뜻
         --TO_CHAR 함수를 사용해서 숫자->문자열 달러표시로 변환해주는 함수 사용됨
 FROM employees;
 
