@@ -263,7 +263,7 @@ AND salary > 3000;
 -- 4. 문제 
 -- 최고월급(max_salary)이 10000 이상인 업무의 이름(job_title)과 
 -- 최고월급(max_salary)을 최고월급의(max_salary) 내림차순(DESC)로 정렬하여 출력하세요.
-SELECT job_id "job_title", salary "max_salary"
+SELECT job_id , salary s
 FROM employees
 WHERE salary > 10000
 ORDER BY salary DESC;
@@ -339,7 +339,7 @@ SELECT value FROM nls_session_parameters    --환경변수를 담고있는 세�
 WHERE parameter = 'NLS_DATE_FORMAT';        --파라미터명이 '' 이것인 값을 확인해본것 
 -- DATE FORMAT확인시-> RR TYPE으로 되있는것알수있음
 
----------------------------
+------------------------------
 -- 현재 날짜 : SYSDATE
 SELECT sysdate 
 FROM dual;           -- 가상 테이블 dual로부터 받아오므로 1개의 레코드 존재
@@ -363,12 +363,11 @@ SELECT first_name, hire_date,
 FROM employees;
 
 
--- 변환 함수
+-- 변환 함수---------------------------
 -- 1,TO NUMBER(s, fmt) : 문자열 -> 숫자
 -- 2,TO_DATE(s, fmt) : 문자열 -> 날짜
 -- 3,TO_CHAR(0, fmt) : 숫자, 날짜 -> 문자열
 
---------------------------------
 -- TO_CHAR : 숫자, 날짜 -> 문자열
 -- 입사일을 yy-mm-dd형식으로 출력
 SELECT first_name, 
@@ -392,7 +391,7 @@ SELECT first_name, salary, commission_pct,
         --TO_CHAR 함수를 사용해서 숫자->문자열 달러표시로 변환해주는 함수 사용됨
 FROM employees;
 
------------------------------------
+
 -- TO NUMBER(s, fmt) : 문자열 -> 숫자
 SELECT '$57,600',
     TO_NUMBER('$57,600', '$999,999') "TO_NUMBER",
@@ -403,3 +402,75 @@ FROM DUAL;
 SELECT '2012-09-24 13:48:00',
     TO_DATE('2012-09-24 13:48:00', 'YYYY-MM-DD HH24:MI:SS') TO_DATE
 FROM DUAL;
+
+-----------------------------------
+-- 날짜 연산
+-- Date +/- Number : 특정 날수를 더하거나 뺄 수 있다.
+-- Date - Date : 특정 날수 끼리 빼면 두날짜의 경과 일수를 출력가능
+-- Date + Number / 24 : 특정 시간이 지난 후의 날짜
+SELECT sysdate, 
+        sysdate + 1, sysdate - 1,                  -- 특정 날수를 ++ ,--
+        sysdate - TO_DATE('20120924') "경과 일수",  -- 현재시간 - ('특정날짜문자열'입력후 날짜로변환해준값)
+        sysdate + 48 / 24 "변경된 날짜"             -- 48시간이 지난후의 날짜
+FROM DUAL;
+
+------------------------------------
+-- nvl function
+SELECT first_name, salary, 
+nvl(salary* commission_pct,0) commission 
+-- 산술연산식에 널값 포함-> 모두 널값 주의. 
+-- nvl(표현식, 대체값)
+FROM employees;
+
+-- nvl2 function
+SELECT first_name,
+        salary,
+        nvl2(commission_pct, salary * commission_pct,0) commission 
+        -- nvl2(조건문, null이아닐때의 값, null일때의 값)
+FROM employees;
+
+-------------------------------------
+-- CASE function
+-- 보너스 지급하기로 했을 경우
+-- AD관련 직종에게는 20%, SA관련 직원에겐 10%, IT관련 직원 8%, 나머지 5% 지급하기로 했을경우
+SELECT first_name, job_id, salary,
+        SUBSTR(job_id, 1, 2) 직종,        -- 직종을 SUBSTR 활용해서 뽑아내기후 그값으로 CASE문 활용
+        CASE SUBSTR(job_id, 1, 2)
+            WHEN 'AD' THEN salary * 0.2
+            WHEN 'SA' THEN salary * 0.1
+            WHEN 'IT' THEN salary * 0.08
+        ELSE salary * 0.05 
+        END BONUS                       -- CASE문이 끝났다고 END로 명시해줘야
+FROM employees;
+
+-- CASE문 말고도 DECODE문 활용해보기
+-- DECODE function
+SELECT first_name, job_id, salary,
+        SUBSTR(job_id, 1, 2) 직종,        
+        DECODE ( SUBSTR(job_id, 1, 2), 
+        'AD',salary * 0.2,
+        'SA',salary * 0.1, 
+        'IT',salary * 0.08,
+        salary * 0.05) BONUS
+FROM employees
+ORDER BY 직종, BONUS DESC;                  
+--------------------------------------
+-- EXCERCISE
+-- 직원의 이름, 부서, 팀을 출력
+-- 팀은 부서ID로 결정
+-- 10-30 ; A-GROUP
+-- 40-50 ; B-GROUP
+-- 60-100 ; C-GROUP
+-- 나머지 부서 ; REMAINDER
+
+SELECT first_name, job_id, department_id,
+                            CASE  --(오류이유;위의값을 그대로 가져오는 것이므로 department_id를 따로 적어줄필요 없음)
+                            WHEN department_id <= 30 THEN 'A-GROUP'
+                            WHEN department_id <= 50 THEN 'B-GROUP'
+                            WHEN department_id <= 100 THEN 'C-GROUP'
+                            ELSE 'REMAINDER' 
+                            END TEAM 
+FROM employees
+ORDER BY TEAM, department_id;
+
+
