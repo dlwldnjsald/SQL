@@ -109,21 +109,19 @@ ORDER BY LENGTH(department_name) DESC;
 -- 9. 문제??
 -- 정확하지 않지만, 지사가 있을 것으로 예상되는 나라들을 나라이름을 대문자로 출력하고
 -- 올림차순(ASC)으로 정렬해 보세오.
-SELECT UPPER(country_id) 나라이름,city, 
-        location_id,postal_code,state_province,street_address
-FROM LOCATIONS
-WHERE street_address IS NOT NULL 
-ORDER BY country_id;
-
+SELECT UPPER(country_name) 나라이름
+FROM countries
+ORDER BY UPPER(country_name);
 
 
 
 -- 10. 문제
+-- 문자열 치환 replace 함수 사용하기 
 -- 입사일이 03/12/31 일 이전 입사한 직원의 이름, 월급, 전화 번호, 입사일을 출력하세요
 -- 전화번호는 545-343-3433 과 같은 형태로 출력하시오.
 SELECT first_name || ' ' || last_name 직원명, 
         TO_CHAR((salary + salary * NVL(commission_pct,0)), '$999,999.99') "월급($)",
-        TO_CHAR(phone_number,'999-999-9999') 전화번호,
+        REPLACE(phone_number,'.','-') 전화번호,  -->REPLACE로 바꿔주기 주의 . -> - 로 치환
         TO_CHAR(hire_date, 'YY/MM/DD') 입사일
 FROM employees
 WHERE hire_date <= TO_CHAR(hire_date, 'YY/MM/DD'); 
