@@ -102,10 +102,11 @@ ORDER BY 부서명 ;
 DESC REGIONS; 
 DESC COUNTRIES;
 
-SELECT R.region_name 지역이름, C.country_name 나라이름 
-FROM regions R JOIN countries C
-    ON R.region_id = C.region_id
-ORDER BY 지역이름, 나라이름 DESC; 
+SELECT R.region_name AS 지역이름, 
+       C.country_name AS 나라이름 
+FROM regions R 
+FULL OUTER JOIN countries C ON R.region_id = C.region_id
+ORDER BY R.region_name, C.country_name DESC;
 
 
 
@@ -116,9 +117,21 @@ ORDER BY 지역이름, 나라이름 DESC;
 사일(hire_date)을 조회하세요.
 (37건)
 */
-DESC EMPLOYEES;
+-- EMP( EMPLOYEE_ID, FIRST_NAME , HIRE_DATE, MANAGER_ID)
+-- DEP(  MANAGER_ID )
+DESC EMPLOYEES; 
 DESC DEPARTMENTS;
 
+SELECT EMP.employee_id AS 사번, 
+       EMP.first_name AS 사원이름, 
+       EMP.hire_date AS 채용일, 
+       MAN.first_name AS 매니저이름, 
+       MAN.hire_date AS 매니저입사일
+FROM employees EMP 
+FULL OUTER JOIN employees MAN ON EMP.manager_id = MAN.employee_id
+FULL OUTER JOIN departments DEPT ON EMP.department_id = DEPT.department_id
+WHERE EMP.hire_date < MAN.hire_date
+ORDER BY 채용일;
 
 
 /*
@@ -130,6 +143,7 @@ DESC DEPARTMENTS;
 (27건)
 */
 
+
 /*
 문제7.
 job_history 테이블은 과거의 담당업무의 데이터를 가지고 있다.
@@ -139,6 +153,7 @@ job_history 테이블은 과거의 담당업무의 데이터를 가지고 있다
 (2건)
 */
 
+
 /*
 문제8.
 각 부서(department)에 대해서 부서번호(department_id), 부서이름(department_name),
@@ -146,6 +161,7 @@ job_history 테이블은 과거의 담당업무의 데이터를 가지고 있다
 (countries_name) 그리고 지역구분(regions)의 이름(resion_name)까지 전부 출력해 보세요.
 (11건)
 */
+
 
 /*
 문제9.
