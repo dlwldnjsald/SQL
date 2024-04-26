@@ -186,13 +186,18 @@ ON emp.manager_id = dept.manager_id AND emp.department_id = dept.department_id; 
 -- 자기 자신과 JOIN
 -- 자신을 두번 호출하기때문-> 별칭ALIAS 반드시 부여해야할 필요 있는 JOIN
 
+-- 담당 매니저가 있는지 확인해보고자 한다면
 SELECT * FROM EMPLOYEES; --107개의 행
+SELECT * FROM EMPLOYEES WHERE MANAGER_ID IS NULL; 
+--> 간단히 NULL값 1명 확인 가능 
 
-
+--> 하지만 NULL값이 여러명인 경우? 또는 더 확실한 코드로
 SELECT emp.employee_id 직원아이디, emp.first_name 직원명, 
         emp.manager_id 담당매니저아이디, man.first_name 담당매니저명
---FROM employees emp JOIN employees man
---ON emp.manager_id = man.employee_id;
-FROM employees emp, employees man
-WHERE emp.manager_id = man.employee_id; --106
+-------        
+--FROM employees emp JOIN employees man   --EMPLOYEES의 중복 테이블 MAN별칭붙여 생성
+--ON emp.manager_id = man.employee_id;    
+-------이렇게 하는것도 가능하지만 더 간단히 아래처럼도 가능
+FROM employees emp, employees man        
+WHERE emp.manager_id = man.employee_id; --106개 행이 출력된것 확인할 수 있음
 
