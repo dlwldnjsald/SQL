@@ -121,7 +121,10 @@ ORDER BY UPPER(country_name);
 -- 전화번호는 545-343-3433 과 같은 형태로 출력하시오.
 SELECT first_name || ' ' || last_name 직원명, 
         TO_CHAR((salary + salary * NVL(commission_pct,0)), '$999,999.99') "월급($)",
-        REPLACE(phone_number,'.','-') 전화번호,  -->REPLACE로 바꿔주기 주의 . -> - 로 치환
+        REPLACE(SUBSTR(phone_number,3), '.', '-') 전화번호,  
+        -->REPLACE로 바꿔주기 주의 . -> - 로 치환
+        --+) 지역번호도 지우기 위해선 SUBSTR(PHONE_NUMBER,3번째위치부터 끝까지 출력)(여기서 끝까지는 생략가능)
+        --+) SUBSTR(PHONE_NUMBER,3,LENGTH(PHONE_NUMBER)-2) 이렇게도 가능
         TO_CHAR(hire_date, 'YY/MM/DD') 입사일
 FROM employees
 WHERE hire_date <= TO_CHAR(hire_date, 'YY/MM/DD'); 
