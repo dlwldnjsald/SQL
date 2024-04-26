@@ -197,7 +197,7 @@ SELECT emp.employee_id 직원아이디, emp.first_name 직원명,
 -------        
 --FROM employees emp JOIN employees man   --EMPLOYEES의 중복 테이블 MAN별칭붙여 생성
 --ON emp.manager_id = man.employee_id;    
--------이렇게 하는것도 가능하지만 더 간단히 아래처럼도 가능
+------아래처럼도 가능
 FROM employees emp, employees man        
 WHERE emp.manager_id = man.employee_id; --106개 행이 출력된것 확인할 수 있음
 
