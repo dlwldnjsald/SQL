@@ -59,7 +59,7 @@ ORDER BY max_salary DESC;
 -- 월급이 14000 미만 10000 이상인 직원의 이름(first_name), 월급, 커미션퍼센트 를 
 -- 월급순(내림차순) 출력하세오. 
 -- 조건) 단 커미션퍼센트 가 null 이면 0 으로 나타내시오 nvl(commission_pct,0)
-SELECT first_name || ' ' || last_name 직원명,
+SELECT first_name 직원명,
         TO_CHAR((salary + salary * NVL(commission_pct,0)), '$999,999.99') "월급($)" ,
         nvl(commission_pct,0) "커미션%"
 FROM employees
@@ -95,6 +95,7 @@ WHERE UPPER(first_name) LIKE '%S%'                     -- 대문자로 정렬후
 ORDER BY "월급($)" DESC ;
 
 
+
 -- 8. 문제
 -- 전체 부서를 출력하려고 합니다. 
 -- 순서는 부서이름이 긴 순서대로 출력해 보세오.
@@ -106,11 +107,11 @@ ORDER BY LENGTH(department_name) DESC;
 -- 9. 문제??
 -- 정확하지 않지만, 지사가 있을 것으로 예상되는 나라들을 나라이름을 대문자로 출력하고
 -- 올림차순(ASC)으로 정렬해 보세오.
-SELECT UPPER(city), UPPER(country_id), 
+SELECT UPPER(country_id) 나라이름,city, 
         location_id,postal_code,state_province,street_address
 FROM LOCATIONS
-WHERE state_province IS NOT NULL 
-ORDER BY city, country_id;
+WHERE street_address IS NOT NULL 
+ORDER BY country_id;
 
 
 
@@ -120,10 +121,10 @@ ORDER BY city, country_id;
 -- 전화번호는 545-343-3433 과 같은 형태로 출력하시오.
 SELECT first_name || ' ' || last_name 직원명, 
         TO_CHAR((salary + salary * NVL(commission_pct,0)), '$999,999.99') "월급($)",
-        TO_CHAR(phone_number,'XXX-XXX-XXXX') 전화번호,
-        hire_date 입사일
+        TO_CHAR(phone_number,'999-999-9999') 전화번호,
+        TO_CHAR(hire_date, 'YY/MM/DD') 입사일
 FROM employees
-WHERE hire_date >= 03/12/31; 
+WHERE hire_date <= TO_CHAR(hire_date, 'YY/MM/DD'); 
         
 
 
