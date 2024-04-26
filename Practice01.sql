@@ -25,7 +25,7 @@ ORDER BY 입사일 ;
 -- 업무(jobs)별로 업무이름(job_title)과 최고월급(max_salary)을 월급의 내림차순(DESC)로 정렬
 SELECT * 
 FROM JOBS
-ORDER BY min_salary DESC, max_salary DESC ; -- 컬럼명 하고 차순지정해서 해도 괜찮음 EX) 최고월급 DESC; 
+ORDER BY max_salary DESC ; -- 컬럼명 하고 차순지정해서 해도 괜찮음 EX) 최고월급 DESC; 
 -- 오류이유 :이때 SUBSTR(job_id,1,2)의 오름차순을 구하고 싶은 거지 -> JOB_ID ASC하면 오류뜸 주의하기 구분해줄것..
 
 
@@ -90,6 +90,7 @@ FROM employees                      --주의)LIKE문은 이 절이 아닌 WHERE�
 WHERE UPPER(first_name) LIKE '%S%'                     -- 대문자로 정렬후 s를 추출 
 -- 또는 WHERE LOWER(first_name) LIKE '%s%'; 이렇게 해도 정상출력됨
 -- first_name을 UPPER 또는 LOWER로 감싸고 LIKE문옆에 '%S%' 또는 '%s%' 를 출력하면 편함
+
 -- 방법2) WHERE first_name LIKE '%S%' OR first_name LIKE '%s%';
 -- 오류 원인: WHERE first_name LIKE '%s%'; 이렇게만 출력하는 경우 소문자만 출력되서 오류뜸
 ORDER BY "월급($)" DESC ;
@@ -99,7 +100,8 @@ ORDER BY "월급($)" DESC ;
 -- 8. 문제
 -- 전체 부서를 출력하려고 합니다. 
 -- 순서는 부서이름이 긴 순서대로 출력해 보세오.
-SELECT * FROM departments
+SELECT * 
+FROM departments
 ORDER BY LENGTH(department_name) DESC;
 
 
