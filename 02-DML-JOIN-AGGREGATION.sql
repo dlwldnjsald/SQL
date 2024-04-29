@@ -94,7 +94,7 @@ WHERE emp.salary < = (j.min_salary + j.max_salary) / 2;
 --(LEFT OUTER JOIN)
 ------------------------
 ---- ORACLE SQL 
--- NULL이 포함된 테이블쪽에 (+)사인을 표기
+-- NULL할 (포함된)테이블쪽에 (+)사인을 표기
 -- DEPT의 널값이 포함되어 왼쪽 테이블 EMP가 출력됨
 --> 왼쪽 EMP TABLE 레코드 전부를 출력에 참여하려는 목적
 SELECT emp.first_name,
