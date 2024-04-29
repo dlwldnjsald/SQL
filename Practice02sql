@@ -78,9 +78,14 @@ WHERE hire_date = (
 평균임금과 최저임금의 차이가 2000 미만인 부서(department_id), 평균임금, 최저임금 그리
 고 (평균임금 – 최저임금)를 (평균임금 – 최저임금)의 내림차순으로 정렬해서 출력하세요.
 */
-SELECT AVG(salary) 평균임금, MIN(salary) 최저임금, 
-        AVG(salary)-MIN(salary)"(평균임금- 최저임금)"
-FROM employees;
+SELECT AVG(salary) AS 평균임금, 
+       MIN(salary) AS 최저임금, 
+       AVG(salary) - MIN(salary) "(평균임금 - 최저임금)"
+FROM employees
+GROUP BY department_id
+    HAVING AVG(salary) - MIN(salary) < 2000
+ORDER BY "(평균임금 - 최저임금)" DESC;
+
 
 
 
@@ -89,6 +94,13 @@ FROM employees;
 업무(JOBS)별로 최고임금과 최저임금의 차이를 출력해보세요.
 차이를 확인할 수 있도록 내림차순으로 정렬하세요?
 */
+SELECT JOB_ID AS 업무아이디, 
+       JOB_TITLE AS 업무명, 
+       MAX_SALARY - MIN_SALARY AS 차이
+FROM JOBS
+GROUP BY JOB_ID, JOB_TITLE
+ORDER BY 차이 DESC;
+
 
 
 /*
