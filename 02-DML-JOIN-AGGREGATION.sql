@@ -224,9 +224,11 @@ SELECT COUNT(*) FROM employees
 WHERE commission_pct IS NOT NULL;
 
 
+
 ---- SUM: 합계 함수
 -- 모든 사원의 급여의 함계?
 SELECT SUM(salary) FROM employees;
+
 
 
 ---- AVG: 평균 함수
@@ -241,6 +243,7 @@ SELECT AVG(NVL(commission_pct,0))FROM employees;
 -- AVG 함수는 NULL값이 포함되어있을 경우 그 값을 집계 수치에서 제외한다
 
 
+
 ---- MIN/MAX : 최솟값/최댓값 함수
 ---- AVG/ MEDIAN : 산술평균/중앙값 함수
 SELECT MIN(salary) 최소급여,
@@ -248,6 +251,7 @@ SELECT MIN(salary) 최소급여,
         AVG(salary) 평균급여,
         MEDIAN(salary) 급여중앙값
 FROM employees;
+
 
 
 -- 흔히 범하는 오류
@@ -286,6 +290,7 @@ GROUP BY department_id
 ORDER BY department_id;
 
 
+
 ---- ROLL UP
 -- GROUP BY 절과 함께 사용
 -- 그룹 지어진 결과에 대한 좀 더 상세한 요약을 제공하는 기능 수행
@@ -293,6 +298,7 @@ ORDER BY department_id;
 SELECT department_id 부서, job_id, SUM(salary) FROM employees
 GROUP BY ROLLUP(department_id, job_id)
 ORDER BY 부서;
+
 
 
 ---- CUBE
@@ -303,3 +309,52 @@ SELECT department_id 부서, job_id, SUM(salary) FROM employees
 GROUP BY CUBE(department_id, job_id)
 ORDER BY 부서;
 
+
+-----------------------------------
+---- SUBQUERY (SINGLE -ROW SUBQUERY)
+-----------------------------------
+-- 모든 직원의 급여의 중앙값보다 많은 급여를 받는 사원?
+-- 1)모든 직원의 급여의 중앙값?
+-- 2)위의 값보다 많은 급여를 받는 직원의 목록?
+
+-- 1) 직원 급여의 중앙값
+SELECT MEDIAN(salary)급여중앙값 FROM employees; --6200 (1)
+----------------
+SELECT first_name 직원명, salary 급여
+FROM Employees
+WHERE salary >= 6200; -->  1번의 쿼리를 여기 6200값에 대체 (2)
+-----------------
+SELECT first_name 직원명, salary "중앙값보다 많은 급여"
+FROM Employees
+WHERE salary >= (SELECT MEDIAN(salary) FROM employees)
+ORDER BY "중앙값보다 많은 급여" DESC;   --(3)
+
+
+-- SUSAN보다 늦게 입사한 사원의 정보 
+-- 1) SUSAN의 입사일 정보
+-- 2) 1)보다 늦게 입사한 사원의 목록 정보
+-- 3) 위 둘을 융합
+SELECT  hire_date FROM employees
+WHERE first_name = 'Susan'; -- 12/06/07 (1)
+-------------
+SELECT first_name 직원명, hire_date 사원목록
+FROM employees 
+WHERE hire_date > '12/06/07'; -- (2)
+--------------
+SELECT first_name "수잔보다 늦게 입사한 사원", hire_date 입사일
+FROM employees 
+WHERE hire_date > (SELECT  hire_date FROM employees
+                    WHERE first_name = 'Susan') --(3)
+ORDER BY 입사일;
+                    
+                    
+-- (1)급여를 모든 직원 급여의 중앙값보다 많이 받으면서 
+-- (2)수잔보다 늦게 입사한 직원의 목록
+SELECT first_name "수잔보다 늦게 입사한 사원", 
+        salary "중앙값보다 많은 급여", 
+        hire_date 입사일
+FROM employees
+WHERE salary > (SELECT MEDIAN(salary) FROM employees) --(1)
+    AND hire_date > (SELECT hire_date FROM employees  --(2)
+                        WHERE first_name = 'Susan')
+ORDER BY "중앙값보다 많은 급여" DESC, 입사일 ;
