@@ -1,60 +1,115 @@
 
 /*
 문제1.
-직원들의 사번(employee_id), 이름(firt_name), 성(last_name)과 부서명(department_name)을
-조회하여 부서이름(department_name) 오름차순, 사번(employee_id) 내림차순 으로 정렬하세
-요.
+직원들의 사번(employee_id), 이름(firt_name), 성(last_name)과 
+부서명(department_name)을 조회하여 
+부서이름(department_name) 오름차순, 사번(employee_id) 내림차순 으로 정렬하세요.
 (106건)
 */
+--프로젝션할 컬럼들을 정확히 파악한다 
+--컬럼이 속해있는 테이블을 찾아간다
+--출력하고자 하는 컬럼의 중복여부 확인해준다
+--중복-> DEPARTMENT_ID인것을 확인
+
+-- 1)simple join
 desc employees;
-desc departments;
---중복-> DEPARTMENT_ID
-SELECT department_name 부서이름, employee_id 사번
-FROM EMPLOYEES EMP, DEPARTMENTS DEPT
-WHERE EMP.department_id = dept.department_id
-ORDER BY 부서이름 ,사번 DESC;
+desc departments
+--step by step>
+SELECT  EMP.employee_id E사번, 
+        EMP.first_name E이름, 
+        EMP.last_name E성, 
+        DEPT.department_name D부서명             -->셀렉트문으로 프로젝션할 컬럼 순서대로 명시
+FROM EMPLOYEES EMP, DEPARTMENTS DEPT            --> simple join
+WHERE EMP.department_id = dept.department_id    --> join 조건  
+ORDER BY D부서명 ,E사번 DESC;                     --> 정렬 기준
+
+-- 2)ANSI SQL
+-- JOIN의 의도를 명확하게 하고, 조인조건과 SELECTION조건을 분리하는 효과를 가져온다
+-- JOIN문 쓸 경우 중심테이블을 먼저 잡고 조인,ON(조인조건)을 잘 명시해준다
+SELECT  EMP.employee_id E사번, 
+        EMP.first_name E이름, 
+        EMP.last_name E성, 
+        DEPT.department_name D부서명          -->셀렉트문으로 프로젝션할 컬럼 순서대로 명시
+FROM employees EMP JOIN departments DEPT     --> simple join
+ON EMP.department_id = DEPT.department_id    --> join 조건  
+ORDER BY D부서명 ,E사번 DESC;    
+
+
 
 
 /*문제2.
 employees 테이블의 job_id는 현재의 업무아이디를 가지고 있습니다.
 직원들의 사번(employee_id), 이름(firt_name), 급여(salary), 부서명(department_name), 현
 재업무(job_title)를 사번(employee_id) 오름차순 으로 정렬하세요.
+
 부서가 없는 Kimberely(사번 178)은 표시하지 않습니다.
 (106건)
 */
+-- 중심테이블 파악 -> EMP
 desc employees;
 desc departments;
 desc jobs;
 
-SELECT employee_id 사번, first_name 이름, salary 급여, 
-        DEPT.department_name 부서명, 
-        J.job_title 현재업무
-FROM employees EMP JOIN departments DEPT 
-     ON EMP.department_id = DEPT.department_id
-        JOIN jobs J     --> 조인 추가!
-        ON EMP.job_id = J.job_id
-WHERE EMP.salary BETWEEN J.min_salary AND J.max_salary --> between함수로 최고-최저사이의 샐러리값 출력 
-ORDER BY 사번;
+-- 1)SIMPLE JOIN의 방법
+SELECT  EMP.employee_id E사번, 
+        EMP.first_name E이름, 
+        EMP.salary E급여, 
+        DEPT.department_name D부서명, 
+        J.job_title J현재업무
+FROM employees EMP ,departments DEPT, jobs J 
+WHERE EMP.department_id = DEPT.department_id 
+    AND EMP.job_id = J.job_id                   -- WHERE 조건문들을 AND로 묶어주기
+ORDER BY E사번;
+
+-- 2)ANSI SQL 를 활용하여 JOIN
+SELECT  EMP.employee_id E사번, 
+        EMP.first_name E이름, 
+        EMP.salary E급여, 
+        DEPT.department_name D부서명, 
+        J.job_title J현재업무
+FROM employees EMP JOIN departments DEPT ON EMP.department_id = DEPT.department_id --> JOIN후 바로 ON
+        JOIN jobs J ON EMP.job_id = J.job_id                                     --> JOIN 추가후 조건 ON
+ORDER BY E사번;
+--> ON 과 WHERE절의 적절한 융합으로 코드 작성 
+--> 부서가 없는 Kimberely(사번 178)은 표시하지 않습니다. 라는 조건이 있는데
+--> 위 조건의 경우 널값은 출력되지 않는다 왜냐하면 조인했을때 연결되는 짝이 없기 때문
+--> 널값도 출력되기 위해 OUTER JOIN을 사용하는 방법이 있다
+
+
 
 
 /*
 문제2-1.
 문제2에서 부서가 없는 Kimberely(사번 178)까지 표시해 보세요
+--> 널값도 출력되기 위해 OUTER JOIN을 사용하는 방법이 있다
 (107건)
 */
-select * from departments where department_id is null; --> null인값 없음
-select * from employees where department_id is null; --> null인 값 kimberely 확인
---null이 있는 테이블에 (+) 해주고 출력
+select * from employees where department_id is null; 
+--> null인 값 부서(DEPARTMENT_ID)가 없는 kimberely 사원 확인해주기
 
-SELECT employee_id 사번, first_name 이름, salary 급여, 
-        DEPT.department_name 부서명, 
-        J.job_title 현재업무
-FROM employees EMP LEFT OUTER JOIN departments DEPT 
-     ON EMP.department_id = DEPT.department_id(+) -->NULL인 값에 (+)
-         JOIN jobs J 
-         ON EMP.job_id = J.job_id
-WHERE EMP.salary BETWEEN J.min_salary AND J.max_salary --> between함수로 최고-최저사이의 샐러리값 출력 
-ORDER BY 사번;
+-- 1)SIMPLE JOIN의 방법
+SELECT  EMP.employee_id E사번, 
+        EMP.first_name E이름, 
+        EMP.salary E급여, 
+        DEPT.department_name D부서명, 
+        J.job_title J현재업무
+FROM employees EMP ,departments DEPT, jobs J 
+WHERE EMP.department_id = DEPT.department_id(+) --> NULL이 포함된 테이블쪽에 (+)사인 
+    AND EMP.job_id = J.job_id                                     
+ORDER BY E사번;
+
+-- 2)ANSI SQL 를 활용하여 JOIN (가급적 이 방법을 추천)
+SELECT  EMP.employee_id E사번, 
+        EMP.first_name E이름, 
+        EMP.salary E급여, 
+        DEPT.department_name D부서명, 
+        J.job_title J현재업무
+FROM employees EMP LEFT OUTER JOIN departments DEPT  -->EMP를 중심으로 레프트 아우터 조인으로 명시적 지정
+        ON EMP.department_id = DEPT.department_id(+) --> NULL이 포함된 테이블쪽에 (+)사인 
+        JOIN jobs J ON EMP.job_id = J.job_id                                    
+ORDER BY E사번; 
+
+
 
 
 /*
@@ -69,10 +124,15 @@ ORDER BY 사번;
 desc locations; 
 desc departments;  
 
-SELECT L.location_id 도시아이디,
-        city 도시명, Dept.department_name 부서명, Dept.department_id 부서아이디 
-FROM locations L JOIN departments DEPT ON L.location_id = Dept.location_id
-ORDER BY 도시아이디 ;
+-- ANSI SQL JOIN
+SELECT L.location_id L도시아이디,
+        city L도시명, 
+        DEPT.department_name D부서명, 
+        DEPT.department_id D부서아이디 
+FROM locations L JOIN departments DEPT ON L.location_id = DEPT.location_id
+ORDER BY L도시아이디 ;
+    
+    
     
     
 /*
@@ -80,15 +140,18 @@ ORDER BY 도시아이디 ;
 문제3에서 부서가 없는 도시도 표시합니다.
 (43건)
 */
-DESC LOCATIONS;
-DESC DEPARTMENTS;
+DESC locations;
+DESC departments;
 
-SELECT L.location_id 도시아이디,
-        city 도시명, Dept.department_name 부서명, Dept.department_id 부서아이디 
-FROM locations L LEFT OUTER JOIN departments DEPT 
-    ON L.location_id = Dept.location_id(+) --43
-ORDER BY 부서명 ;
+-- ANSI SQL JOIN
+SELECT L.location_id L도시아이디,
+        city L도시명, 
+        DEPT.department_name D부서명, 
+        DEPT.department_id D부서아이디 
+FROM locations L LEFT OUTER JOIN departments DEPT ON L.location_id = Dept.location_id(+) --43
+ORDER BY D부서명 ;
     
+
 
 
 /*
@@ -97,16 +160,17 @@ ORDER BY 부서명 ;
 되 지역이름(오름차순), 나라이름(내림차순) 으로 정렬하세요.
 (25건)
 */
---REGIONS; 지역이름, 
---CONUNTRIES; 나라이름
-DESC REGIONS; 
-DESC COUNTRIES;
+--region; 지역이름, 
+--countries; 나라이름
+DESC region; 
+DESC countries;
 
-SELECT R.region_name AS 지역이름, 
-       C.country_name AS 나라이름 
-FROM regions R 
-FULL OUTER JOIN countries C ON R.region_id = C.region_id
-ORDER BY R.region_name, C.country_name DESC;
+-- ANSI SQL JOIN
+SELECT R.region_name AS R지역이름, 
+       C.country_name AS C나라이름 
+FROM regions R JOIN countries C ON R.region_id = C.region_id
+ORDER BY R지역이름, C나라이름 DESC;
+
 
 
 
@@ -117,21 +181,21 @@ ORDER BY R.region_name, C.country_name DESC;
 사일(hire_date)을 조회하세요.
 (37건)
 */
--- EMP( EMPLOYEE_ID, FIRST_NAME , HIRE_DATE, MANAGER_ID)
--- DEP(  MANAGER_ID )
-DESC EMPLOYEES; 
-DESC DEPARTMENTS;
+-- EMP( EMPLOYEE_ID, FIRST_NAME , HIRE_DATE, MANAGER_ID) 중에서 파악
+DESC employees; 
+DESC departments;
 
-SELECT EMP.employee_id AS 사번, 
-       EMP.first_name AS 사원이름, 
-       EMP.hire_date AS 채용일, 
-       MAN.first_name AS 매니저이름, 
-       MAN.hire_date AS 매니저입사일
-FROM employees EMP 
-FULL OUTER JOIN employees MAN ON EMP.manager_id = MAN.employee_id
-FULL OUTER JOIN departments DEPT ON EMP.department_id = DEPT.department_id
+-- ANSI SQL JOIN / SELF JOIN 활용
+SELECT EMP.employee_id AS E사번, 
+       EMP.first_name AS E사원이름, 
+       EMP.hire_date AS E채용일, 
+       MAN.first_name AS M매니저이름, 
+       MAN.hire_date AS M매니저입사일
+FROM employees EMP JOIN employees MAN ON EMP.manager_id = MAN.employee_id
 WHERE EMP.hire_date < MAN.hire_date
-ORDER BY 채용일;
+ORDER BY M매니저이름;
+
+
 
 
 /*
@@ -142,25 +206,60 @@ ORDER BY 채용일;
 값이 없는 경우 표시하지 않습니다.
 (27건)
 */
+SELECT C.country_name C나라명, 
+        C.country_id C나라아이디, 
+        L.city L도시명, 
+        L.location_id L도시아이디,
+        DEPT.department_name D부서명, 
+        DEPT.department_id D부서아이디
+FROM countries C JOIN locations L ON C.country_id = L.country_id
+JOIN departments DEPT ON L.location_id = DEPT.location_id
+ORDER BY C나라명;
+
+
 
 
 /*
 문제7.
 job_history 테이블은 과거의 담당업무의 데이터를 가지고 있다.
-과거의 업무아이디(job_id)가 ‘AC_ACCOUNT’로 근무한 사원의 사번, 이름(풀네임), 업무아이
-디, 시작일, 종료일을 출력하세요.
+과거의 업무아이디(job_id)가 ‘AC_ACCOUNT’로 근무한 
+사원의 사번, 이름(풀네임), 업무아이디, 시작일, 종료일을 출력하세요. 
 이름은 first_name과 last_name을 합쳐 출력합니다.
 (2건)
 */
+SELECT EMP.employee_id E사번, 
+        EMP.FIRST_NAME || ' ' || LAST_NAME E이름,
+        JH.job_id JH업무아이디,
+        JH.start_date JH시작일,
+        JH.end_date JH종료일
+FROM employees EMP JOIN job_history JH ON EMP.employee_id = JH.employee_id
+WHERE JH.job_id = 'AC_ACCOUNT';
+
+
 
 
 /*
 문제8.
 각 부서(department)에 대해서 부서번호(department_id), 부서이름(department_name),
-매니저(manager)의 이름(first_name), 위치(locations)한 도시(city), 나라(countries)의 이름
+매니저(manager)의 이름(first_name), 
+위치(locations)한 도시(city), 나라(countries)의 이름
 (countries_name) 그리고 지역구분(regions)의 이름(resion_name)까지 전부 출력해 보세요.
 (11건)
 */
+SELECT DEPT.department_id 부서번호, 
+        DEPT.department_name 부서이름, 
+        M.first_name 매니저이름,
+        L.city 도시,
+        C.country_name 나라이름,
+        R.region_name 지역이름
+FROM 
+    departments DEPT JOIN employees M ON DEPT.manager_id = M.employee_id
+    JOIN locations L ON DEPT.location_id = L.location_id
+    JOIN countries C ON L.country_id = C.country_id
+    JOIN regions R ON C.region_id = R.region_id
+ORDER BY 부서번호;
+
+
 
 
 /*
@@ -170,3 +269,10 @@ job_history 테이블은 과거의 담당업무의 데이터를 가지고 있다
 부서가 없는 직원(Kimberely)도 표시합니다.
 (106명)
 */
+-- SELF JOIN& OUTERjOIN의 활용
+SELECT  EMP.employee_id E사번, 
+        EMP.first_name E이름, 
+        DEPT.department_name D부서명,
+        MAN.first_name M매니저명
+FROM employees EMP LEFT OUTER JOIN departments DEPT ON EMP.department_id = DEPT.department_id
+JOIN employees MAN ON EMP.manager_id = MAN.employee_id;
