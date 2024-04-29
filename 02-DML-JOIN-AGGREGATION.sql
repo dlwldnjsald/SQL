@@ -250,17 +250,56 @@ SELECT MIN(salary) 최소급여,
 FROM employees;
 
 
----- 흔히 범하는 오류
+-- 흔히 범하는 오류
 -- 부서별로 평균 급여 구하고자 할 때
 --> 아래코드와 같이 사용할수 없음
 SELECT department_id, AVG(salary) FROM employees;
 SELECT department_id FROM employees; --> 여러개의 레코드값 존재
 SELECT AVG(salary) FROM employees;   --> 단일 레코드값존재하기 때문
-
--- GROUP BY 사용하는 방법
-SELECT department_id, ROUND(AVG(salary),2) FROM employees
+---- GROUP BY 사용하는 방법
+SELECT department_id 부서아이디, ROUND(AVG(salary),2)평균급여 FROM employees
 GROUP BY department_id -- 집계를 위해 특정 컬럼을 기준으로 그룹핑
+ORDER BY department_id;
+-- 부서별 평균 급여에 부서명도 포함하여 출력하기
+-- group by 절 이후에는 group by에 참여한 컬럼과 집계함수만 남는다
+SELECT EMP.department_id 부서아이디, 
+department_name 부서명, 
+ROUND(AVG(salary),2) 평균급여
+FROM employees EMP JOIN departments DEPT 
+ON EMP.department_id = DEPT.department_id
+GROUP BY EMP.department_id, DEPT.department_name
+ORDER BY EMP.department_id;
+
+
+
+-- 평균 급여가 7000 이상인 부서만 출력
+SELECT department_id, AVG(salary)
+FROM employees
+WHERE AVG(salary)> 7000 --> 아직 집계함수 시행되지 않은 상태라 집계함수의 비교 불가
+GROUP BY department_id
+ORDER BY department_id;
+---- 집계 함수 이후의 조건 비교 Having 절 이용
+SELECT department_id, AVG(salary)
+FROM employees
+GROUP BY department_id
+    HAVING AVG(salary)> 7000 --> GROUP BY AGGREGATION의 조건 필터링 
 ORDER BY department_id;
 
 
+---- ROLL UP
+-- GROUP BY 절과 함께 사용
+-- 그룹 지어진 결과에 대한 좀 더 상세한 요약을 제공하는 기능 수행
+-- 일종의 ITEM TOTAL
+SELECT department_id 부서, job_id, SUM(salary) FROM employees
+GROUP BY ROLLUP(department_id, job_id)
+ORDER BY 부서;
+
+
+---- CUBE
+-- CROSSTAB에 대한 SUMMARY를 함께 추출하는 함수
+-- ROLLUP 함수에 의해 출력되는 ITEM TOTAL 값과 함께
+-- COLUMN TOTAL 값을 함께 출력
+SELECT department_id 부서, job_id, SUM(salary) FROM employees
+GROUP BY CUBE(department_id, job_id)
+ORDER BY 부서;
 
