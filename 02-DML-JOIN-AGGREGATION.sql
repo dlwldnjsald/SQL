@@ -428,6 +428,7 @@ WHERE salary > (SELECT AVG(salary) FROM employees
                 WHERE department_id = outer.department_id);
 -- 내부 쿼리가 다시 외부 쿼리에 영향을 미치는 관계--> correlated
 
+
 -- subquery 연습
 -- 각 부서별로 최고급여를 받는 사원의 목록 (조건절에서 서브쿼리 활용)
 --1.각 부서별 최고급여 출력하는 쿼리
@@ -444,17 +445,70 @@ ORDER BY department_id;
 --1.각 부서별 최고급여 출력하는 쿼리
 SELECT department_id , MAX(salary)
 FROM employees GROUP BY department_id;
+
 --2. 1번쿼리에서 생성한 임시 테이블과 외부 쿼리를 join하는 방법
 SELECT department_id ,employee_id, first_name, salary
 FROM employees 
-WHERE (department_id, salary) IN (SELECT department_id , MAX(salary)
-                                    FROM employees GROUP BY department_id)
+WHERE (department_id, salary) IN(SELECT department_id , MAX(salary) FROM employees GROUP BY department_id)
 ORDER BY department_id;
+--2. SIMPLE JOIN 활용
 SELECT EMP.department_id, EMP.employee_id, EMP.first_name, EMP.salary
-FROM employees EMP, (SELECT department_id , MAX(salary) salary 
-                     FROM employees GROUP BY department_id) SAL
+FROM employees EMP, 
+(SELECT department_id , MAX(salary) salary FROM employees GROUP BY department_id) SAL  --> salary SAL형식으로 만들기
 WHERE EMP.department_id = SAL.department_id AND EMP.salary = SAL.salary
 ORDER BY EMP.department_id;
+
+
+---- TOD-K QUERY(ORACLE)
+-- 질의의 결과로 부여된 가상 컬럼 ROWNUM 값을 사용해서 쿼리순서를 반환하고
+-- ROWNUM값을 활용해서 상위 K개의 값을 얻어오는 쿼리
+
+-- 2017년 입사자 중에서 연봉 순위 5위까지 출력
+
+-- 1. 2017년 입사자는 누구?
+SELECT * FROM employees 
+WHERE hire_date LIKE '17%'
+ORDER BY salary DESC;
+--2. 1번 쿼리 활용해서 ROWNUM값까지 확인, ROWNUM<= 5 인 레코드들-> 상위 5 추출
+SELECT ROWNUM, first_name, salary       --가상 컬럼 rownum 생성
+FROM(SELECT * FROM employees WHERE hire_date LIKE '17%'ORDER BY salary DESC)
+WHERE ROWNUM <= 5;      -- 상위 5개까지 추출 가능
+
+
+
+---- SET OPERATOR(집합 연산)
+-- 두 집합의 결과를 가지고 집합 연산을 수행
+--1) 두개의 쿼리 만들기
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'; -- 15/01/01 이전입사자
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000; --12000초과 급여 받는 직원목록
+--2) 두 쿼리를 가지고 집합연산 수행
+
+
+---- UNION EX.{A, B, C} 합집합)
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+UNION       --중복 레코드는 1개로 취급한다
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       --26 
+
+
+---- UNION ALL EX.{A, B, B, C}(중복포함ㅇ)
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+UNION ALL   --중복 레코드는 별개로 취급한다 -- FULL OUTER JOIN과 비슷
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       --32
+
+
+---- INTERSECT (교집합)
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+INTERSECT       --INNER JOIN과 비슷
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       --6
+
+
+---- MINUS (차집합)
+SELECT first_name, salary, hire_date FROM employees WHERE hire_date < '15/01/01'
+MINUS      
+SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       --18
+
+
+
 
 
 
