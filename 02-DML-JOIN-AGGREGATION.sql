@@ -358,3 +358,117 @@ WHERE salary > (SELECT MEDIAN(salary) FROM employees) --(1)
     AND hire_date > (SELECT hire_date FROM employees  --(2)
                         WHERE first_name = 'Susan')
 ORDER BY "중앙값보다 많은 급여" DESC, 입사일 ;
+
+
+--=============================================================================
+--0430
+---- 다중행 서브쿼리 MULTI ROW SUBQUERY
+-- 서브 쿼리 결과가 둘 이상의 레코드일때 단일행 비교연산자는 사용할 수 없다
+-- 집합 연산에 관련된 IN, ANY, ALL, EXISTS등을 사용해야 한다
+
+----IN
+--직원들 중 
+--110번 부서 사람들이 받는 급여와 같은 급여를 받는 직원들의 목록
+--1. 110부서 사람들은 얼마의 급여를 받는가?
+SELECT salary FROM employees
+WHERE department_id = 110; --12008, 3800 출력
+--2. 직원중 급여가 12008 아니면 3800인 직원의 목록?
+SELECT first_name ,salary 
+FROM employees 
+WHERE salary IN (12008, 8300);  -- IN 함수 사용
+--3. (1)+(2)
+SELECT first_name ,salary 
+FROM employees 
+WHERE salary IN (SELECT salary FROM employees
+                    WHERE department_id = 110); --> 12008, 8300 대신 쿼리 집어넣기
+
+
+---- ALL
+--110번 부서 사람들이 받는 급여보다 많은 같은 급여를 받는 직원들의 목록
+--1. 110부서 사람들은 얼마의 급여를 받는가?
+SELECT salary FROM employees
+WHERE department_id = 110; --12008, 8300 출력
+--2. 1번쿼리전체보다 많이 받는 직원목록 
+SELECT first_name, salary
+FROM employees 
+WHERE salary > ALL (12008,3800);
+--3. (1)+(2)
+SELECT first_name, salary
+FROM employees 
+WHERE salary > ALL (SELECT salary FROM employees
+WHERE department_id = 110);
+
+
+---- ANY
+--110번 부서 사람들이 받는 급여 중 하나보다 많은 같은 급여를 받는 직원들의 목록
+--1. 110부서 사람들은 얼마의 급여를 받는가?
+SELECT salary FROM employees
+WHERE department_id = 110; --12008, 8300 출력
+--2. 1번쿼리 중 하나보다 많이 받는 직원목록 
+SELECT first_name, salary
+FROM employees 
+WHERE salary > ANY (12008,3800);
+--3. (1)+(2)
+SELECT first_name, salary
+FROM employees 
+WHERE salary > ANY (SELECT salary FROM employees
+WHERE department_id = 110);
+
+
+---- CORRELATED QUERY 연관 커리
+-- OUTER QUERY & INNER QUEARY --> CORRELATED
+-- 바깥 쪽 쿼리 & 내부 쿼리
+
+-- 자신이 속한 부서의 평균 급여보다 많이 받는 직원의 목록을 구하라
+-- 외부 쿼리 : 급여를 특정 값보다 많이 받는 직원의 이름, 급여, 부서아이디
+-- 내부 쿼리 : 특정 부서에 소속된 직원의 평균급여
+SELECT first_name, salary, department_id
+FROM employees OUTER 
+WHERE salary > (SELECT AVG(salary) FROM employees   
+                WHERE department_id = outer.department_id);
+-- 내부 쿼리가 다시 외부 쿼리에 영향을 미치는 관계--> correlated
+
+-- subquery 연습
+-- 각 부서별로 최고급여를 받는 사원의 목록 (조건절에서 서브쿼리 활용)
+--1.각 부서별 최고급여 출력하는 쿼리
+SELECT department_id , MAX(salary)
+FROM employees GROUP BY department_id;
+--2. 최고급여(1)를 받는 사원의 목록 (외부 쿼리 작성)
+SELECT department_id ,employee_id, first_name, salary
+FROM employees 
+WHERE (department_id, salary) IN (SELECT department_id , MAX(salary)
+                                    FROM employees GROUP BY department_id)
+ORDER BY department_id;
+
+-- 각 부서별 최고 급여를 받는 사원의 목록( 서브쿼리를 이용, 임시테이블 생성 -> 테이블 join하는 결과 뽑기)
+--1.각 부서별 최고급여 출력하는 쿼리
+SELECT department_id , MAX(salary)
+FROM employees GROUP BY department_id;
+--2. 1번쿼리에서 생성한 임시 테이블과 외부 쿼리를 join하는 방법
+SELECT department_id ,employee_id, first_name, salary
+FROM employees 
+WHERE (department_id, salary) IN (SELECT department_id , MAX(salary)
+                                    FROM employees GROUP BY department_id)
+ORDER BY department_id;
+SELECT EMP.department_id, EMP.employee_id, EMP.first_name, EMP.salary
+FROM employees EMP, (SELECT department_id , MAX(salary) salary 
+                     FROM employees GROUP BY department_id) SAL
+WHERE EMP.department_id = SAL.department_id AND EMP.salary = SAL.salary
+ORDER BY EMP.department_id;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
