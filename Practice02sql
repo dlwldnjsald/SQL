@@ -1,6 +1,12 @@
 --문제1.
 --매니저가 있는 직원은 몇 명입니까? 아래의 결과가 나오도록 쿼리문을 작성하세요 //106명
-SELECT COUNT(manager_id) FROM employees;
+SELECT COUNT(manager_id)HaveManCount 
+FROM employees; --> MANAGER_ID가 널값이 아닌 데이터의 행 갯수 출력
+
+--위의 코드를 아래와같이 써도 무방
+SELECT COUNT(manager_id)HaveManCount 
+FROM employees --> MANAGER_ID가 널값이 아닌 데이터의 행 갯수 출력
+WHERE manager_id IS NOT NULL ;--> (생략해도 괜찮음-> 위의 코드와 비교해보기)
 
 
 
@@ -8,11 +14,10 @@ SELECT COUNT(manager_id) FROM employees;
 --직원중에 최고임금(salary)과 최저임금을 
 --“최고임금, “최저임금”프로젝션 타이틀로 함께 출력해 보세요. 
 --두 임금의 차이는 얼마인가요? “최고임금 – 최저임금”이란 타이틀로 함께 출력해 보세요.
-SELECT MAX(salary) 최고임금, 
+SELECT  MAX(salary) 최고임금, 
         MIN(salary) 최저임금,
         MAX(salary) - MIN(salary) "최고임금 - 최저임금"
 FROM employees;
-
 
 
 
@@ -21,6 +26,11 @@ FROM employees;
 --예) 2014년 07월 10일
 SELECT first_name || ' ' || last_name 사원명,
         TO_CHAR(hire_date,' yyyy"년" mm"월" dd"일" ') "신입 최종입사일"
+FROM employees
+ORDER BY "신입 최종입사일" DESC;
+
+--> 오류원인 위의 값에서 hire_date에 max 처리해주면 됨
+SELECT TO_CHAR( MAX(hire_date),' yyyy"년" mm"월" dd"일" ') "신입 최종입사일" --""로 일반글자를 표시해줘야
 FROM employees
 ORDER BY "신입 최종입사일" DESC;
 
@@ -35,9 +45,18 @@ SELECT  DEPT.department_id 부서아이디,
         ROUND(AVG(salary),2) 평균임금,
         MAX(salary) 최고임금, 
         MIN(salary) 최저임금
-FROM employees EMP JOIN departments DEPT
-ON EMP.department_id = DEPT.department_id
+FROM employees EMP ,departments DEPT
+    WHERE EMP.department_id = DEPT.department_id
 GROUP BY DEPT.department_id 
+ORDER BY 부서아이디 desc;
+
+--> 오류 원인: DEPT JOIN 안해도 됨...
+SELECT  department_id 부서아이디,
+        ROUND(AVG(salary),2) 평균임금,
+        MAX(salary) 최고임금, 
+        MIN(salary) 최저임금
+FROM employees 
+GROUP BY department_id 
 ORDER BY 부서아이디 desc;
 
 
@@ -48,16 +67,15 @@ ORDER BY 부서아이디 desc;
 순서는 최저임금 내림차순, 평균임금(소수점 반올림)오름차순 순입니다.
 (정렬순서는 최소임금 2500 구간일때 확인해볼 것)
 */
-SELECT J.job_id 업무아이디,
-        MIN(salary) 최저임금,
+-- 이것도 굳이 JOIN 안해도 됨...
+SELECT  job_id 업무아이디,
         ROUND(AVG(salary),1) 평균임금, 
-        MAX(salary) 최고임금
-FROM employees EMP JOIN jobs J ON EMP.job_id = J.job_id 
-GROUP BY J.job_id  
+        MAX(salary) 최고임금,
+        MIN(salary) 최저임금
+FROM employees EMP  
+GROUP BY job_id  
     HAVING Min(salary)>= 2500
 ORDER BY 최저임금 DESC, 평균임금;
-
-
 
 
 
@@ -66,11 +84,8 @@ ORDER BY 최저임금 DESC, 평균임금;
 가장 오래 근속한 직원의 입사일은 언제인가요? 다음 형식으로 출력해주세요.
 예) 2001-01-13 토요일
 */
-SELECT first_name || ' ' || last_name 사원명, 
-        TO_CHAR(hire_date, 'yyyy-mm-dd day') "가장 오래 근속한 직원의 입사일"
-FROM employees
-ORDER BY "가장 오래 근속한 직원의 입사일";
-
+SELECT TO_CHAR( MIN(hire_date), 'yyyy-mm-dd day') "가장 오래 근속한 직원의 입사일"
+FROM employees;
 
 
 
@@ -85,7 +100,7 @@ SELECT department_id 부서아이디 ,
        AVG(salary) - MIN(salary) "(평균임금 - 최저임금)"
 FROM employees
 GROUP BY department_id
-    HAVING AVG(salary) - MIN(salary) < 2000
+    HAVING AVG(salary) - MIN(salary) < 2000 -- 집계 함수 이후의 조건 점검은 반드시 HAVING 절에서 해야한다
 ORDER BY "(평균임금 - 최저임금)" DESC;
 
 
@@ -96,12 +111,12 @@ ORDER BY "(평균임금 - 최저임금)" DESC;
 업무(JOBS)별로 최고임금과 최저임금의 차이를 출력해보세요.
 차이를 확인할 수 있도록 내림차순으로 정렬하세요?
 */
-SELECT job_id AS 업무아이디, 
-       job_title AS 업무명, 
-       MAX(max_salary) - MIN(min_salary) AS "최고임금과 최저임금의 차이"
-FROM JOBS
-GROUP BY job_id, job_title
-ORDER BY "최고임금과 최저임금의 차이" DESC;
+SELECT job_id 업무아이디,  
+       MAX(salary) - MIN(salary) AS 임금차이
+FROM EMPLOYEES
+GROUP BY job_id
+ORDER BY 임금차이 DESC;
+
 
 
 /*
@@ -110,15 +125,14 @@ ORDER BY "최고임금과 최저임금의 차이" DESC;
 출력은 관리자별로 평균급여가 5000이상 중에 평균급여 최소급여 최대급여를 출력합니다.
 평균급여의 내림차순으로 정렬하고 평균급여는 소수점 첫째짜리에서 반올림 하여 출력합니다.
 */
-
-SELECT  first_name 입사자, 
+SELECT  MANAGER_ID 매니저,
         ROUND(AVG(salary), 1) 평균급여, 
         MIN(salary) 최소급여, 
         MAX(salary) 최대급여
 FROM employees
-WHERE hire_date >= '2015-01-01'
-GROUP BY first_name
-    HAVING ROUND(AVG(salary), 1) >= 5000
+WHERE hire_date >= '2015-01-01' -- 집계함수 실행 이전의 조건 처리 
+GROUP BY MANAGER_ID
+    HAVING ROUND(AVG(salary), 1) >= 5000 -- 집계함수 실행 이후의 조건 처리 
 ORDER BY 평균급여 DESC;
     
 
@@ -133,8 +147,8 @@ ORDER BY 평균급여 DESC;
 */
 select hire_date from employees ;
 --CASE 문을 사용하기 
-SELECT  first_name AS 직원명, 
-    CASE 
+SELECT  employee_id AS 직원명, salary 급여,
+        CASE 
         WHEN TO_DATE(hire_date, 'yy/mm/dd') <= TO_DATE('02/12/31', 'yy/mm/dd') THEN '창립맴버'
         WHEN TO_DATE(hire_date, 'yy/mm/dd') <= TO_DATE('03/12/31', 'yy/mm/dd') THEN '03년입사'
         WHEN TO_DATE(hire_date, 'yy/mm/dd') <= TO_DATE('04/12/31', 'yy/mm/dd') THEN '04년입사'
@@ -142,6 +156,18 @@ SELECT  first_name AS 직원명,
     END optDate
 FROM employees
 ORDER BY TO_DATE(hire_date, 'yy/mm/dd');
+-- 위의 코드를 굳이 데이트화 시킬필요 없음..
+
+SELECT  employee_id AS 직원명, salary 급여, hire_date 입사일,
+        CASE 
+            WHEN hire_date <= '02/12/31' THEN '창립맴버'
+            WHEN hire_date <= '03/12/31' THEN '03년입사'
+            WHEN hire_date <= '04/12/31' THEN '04년입사'
+        ELSE '상장이후입사'
+         END optDate
+FROM employees
+ORDER BY hire_date;
+    
 
 
 
