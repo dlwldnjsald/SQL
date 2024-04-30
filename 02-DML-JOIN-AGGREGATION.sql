@@ -454,7 +454,7 @@ ORDER BY department_id;
 --2. SIMPLE JOIN 활용
 SELECT EMP.department_id, EMP.employee_id, EMP.first_name, EMP.salary
 FROM employees EMP, 
-(SELECT department_id , MAX(salary) salary FROM employees GROUP BY department_id) SAL  --> salary SAL형식으로 만들기
+(SELECT department_id , MAX(salary) salary FROM employees GROUP BY department_id) SAL  --> salary SAL형식으로 만들기 //위치?
 WHERE EMP.department_id = SAL.department_id AND EMP.salary = SAL.salary
 ORDER BY EMP.department_id;
 
