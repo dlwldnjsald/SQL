@@ -55,6 +55,34 @@ ON LOC.location_id = D.LOC;
 
 
 
+-- 문제4.job_id 가 'ST_MAN' 인 직원의 급여보다 작은 직원의 사번,이름,급여를 
+--급여의 내림차순으로 출력하세요 -ANY연산자 사용(74건)
+
+--job_id가 'ST_MAN'인 직원의 급여
+SELECT job_id 사번, first_name 직원명, salary 급여  
+FROM employees WHERE job_id = 'ST_MAN';
+
+--이 직원의 급여보다 작은 직원 목록
+SELECT job_id 사번, first_name 직원명, salary 급여 
+FROM employees 
+WHERE salary < ANY(SELECT salary 급여 FROM employees WHERE job_id = 'ST_MAN');
+
+
+
+-- 문제5. 각 부서별로 최고의 급여를 받는 사원의 
+--직원번호(employee_id), 이름(first_name)과 급여(salary) 부서번호(department_id)를 조회하세요
+--단 조회결과는 급여의 내림차순으로 정렬되어 나타나야 합니다.
+--조건절비교, 테이블조인 2가지 방법으로 작성하세요
+
+--각 부서별로 최고의 급여를 받는 사원 --101행
+SELECT employee_id 직원번호, first_name 이름, salary 급여, department_id 부서번호 
+FROM EMPLOYEES
+
+
+
+
+
+
 
 
 
