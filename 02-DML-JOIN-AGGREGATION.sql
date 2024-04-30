@@ -464,7 +464,6 @@ ORDER BY EMP.department_id;
 -- ROWNUM값을 활용해서 상위 K개의 값을 얻어오는 쿼리
 
 -- 2017년 입사자 중에서 연봉 순위 5위까지 출력
-
 -- 1. 2017년 입사자는 누구?
 SELECT * FROM employees 
 WHERE hire_date LIKE '17%'
@@ -473,6 +472,16 @@ ORDER BY salary DESC;
 SELECT ROWNUM, first_name, salary       --가상 컬럼 rownum 생성
 FROM(SELECT * FROM employees WHERE hire_date LIKE '17%'ORDER BY salary DESC)
 WHERE ROWNUM <= 5;      -- 상위 5개까지 추출 가능
+
+
+
+---- RANK 관련 함수
+SELECT salary, first_name, 
+        RANK() OVER (ORDER BY salary DESC) as rank,                    --일반적인 순위
+        DENSE_RANK() OVER (ORDER BY salary DESC) as dense_link,
+        ROW_NUMBER() OVER (ORDER BY salary DESC) as row_number, --정렬 했을때의 실제 행 번호
+        ROWNUM                                                  --커리 결과의 행번호(가상 컬럼)
+FROM employees;
 
 
 
@@ -508,7 +517,14 @@ MINUS
 SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;       --18
 
 
-
+--HIERARCHICAL QUERY(ORACLE)
+-- TREE형태의 구조 표현
+-- LEVEL 가상 컬럼 활용 쿼리
+SELECT level, employee_id, first_name, manager_id
+FROM employees
+START WITH manager_id IS NULL               --트리 형태의 root가 되는 조건 명시
+CONNECT BY PRIOR employee_id = manager_id  --상위 레벨과의 연결 조건 (가지치기 조건)
+ORDER BY level;                             --트리의 깊이를 나타내는 oracle 가상 컬럼
 
 
 
