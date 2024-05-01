@@ -42,7 +42,7 @@ GRANT CONNECT, RESOURCE TO HIMEDIA;
 -- 데이터 추가 
 DESCRIBE test;
 INSERT INTO test VALUES (2024);   --테스트란 테이블 안쪽에다가 정의된 값 2024를 집어넣어라--> 여기서 실행 안됨 
---> 오류나는 이유 USERS 테이블 스페이스에 대한 권한이 없다
+--> 오류나는 이유 USERS 테이블 스페이스에 대한 권한이 없다 --권한이 불충분합니다
 -- 19이상 
 
 --> 다시 시스템 계정으로 변경후 실행
@@ -53,12 +53,27 @@ ALTER USER himedia DEFAULT TABLESPACE USERS
         -- TABLESPACE 권한 부여함
         
 --> 다시 himedia 계정으로 변경후 실행
-INSERT INTO test VALUES (2024);  "--1 행 이(가) 삽입되었습니다."가 출력될것
+INSERT INTO test VALUES (2024);  --1 행 이(가) 삽입되었습니다." 가 출력될것
 SELECT * FROM test;
 
 
+SELECT * FROM USER_USERS; -- 현재 로그인한 사용자 정보(나)
+SELECT * FROM ALL_USERS;  -- 모든 사용자 정보
+-- DBA 전용 (sysdba로 로그인해야 확인 가능 실제 계정은 아닌데 역할이라고 보면 됨)
+--cmd : sqlplus system/manager --> ㄴsysdba로 접속 가능
+SELECT * FROM DBA_USERS;
 
 
+
+-- 만일 시나리오: HR스키마의 EMPLOYEES 테이블 조회 권환을 HIMEDIA에게 부여하고자 한다면
+-- HR 스키마의 오너(주인)은 HR -> HR로 접속후 수행해보기 
+GRANT SELECT ON employees TO himedia; --Grant을(를) 성공했습니다.로 출력됨
+
+--> 다시 himedia 계정으로 변경후 실행
+SELECT * FROM HR.employees; 
+-- HR 스키마 안쪽의 EMPLOYEES TABLE의 셀렉트 권한을 HIMEDIA 에게 부여한 값
+SELECT * FROM HR.DEPARTMENTS; --테이블 또는 뷰가 존재하지 않습니다 로 뜨게됨
+-- HR.EMPLOYEES 에 SELECT 할수있는 권한만 부여받은것이기 때문 
 
 
 
