@@ -8,17 +8,20 @@ WHERE salary < ALL (SELECT AVG(salary) FROM employees);
 
 
 
+
 --문제2. 평균급여 이상, 최대급여 이하의 월급을 받는 사원의 
 --직원번호(employee_id), 이름(first_name), 급여(salary), 평균급여, 최대급여를 
 --급여의 오름차순으로 정렬하여 출력하세요(51건)
 
 -->TEACHER'S CODE
 SELECT EMP.employee_id, EMP.first_name, EMP.salary,
-        T. AVGSalary, T. MAXSalary
-FROM employees EMP 
-    JOIN (SELECT ROUND(AVG(salary)) AVGSalary, MAX(salary) MAXSalary FROM employees) T
-        ON EMP.salary BETWEEN T. AVGSalary AND T. MAXSalary
+        T. AVGSalary, T. MAXSalary --CORRELATED
+FROM employees EMP  
+    JOIN (SELECT ROUND(AVG(salary)) AVGSalary, MAX(salary) MAXSalary FROM employees) T --CORRELATED
+        ON EMP.salary BETWEEN T. AVGSalary AND T. MAXSalary  --> BETWEEN 함수로 편하게 사용
 ORDER BY salary;
+-->CORRELATED관계..
+
 
 
 
@@ -28,7 +31,7 @@ ORDER BY salary;
 SELECT DEPARTMENT_ID FROM EMPLOYEES WHERE FIRST_NAME = 'Steven';
 
 -- 1)STEVEN이 소속된 부서 출력
-SELECT e.first_name 이름, e.last_name 성, d.department_id 부서아이디, d.location_id
+SELECT d.department_id 부서아이디, d.location_id LOC
 FROM employees e ,DEPARTMENTS d
 WHERE e.department_id = d.department_id AND e.first_name = 'Steven' AND e.last_name = 'King';
 
@@ -36,11 +39,27 @@ WHERE e.department_id = d.department_id AND e.first_name = 'Steven' AND e.last_n
 SELECT LOC.location_id 도시아이디 , LOC.street_address 거리명 , LOC.postal_code 우편번호 , 
         LOC.city 도시명 ,LOC.state_province 주, LOC.country_id 나라아이디
 FROM locations LOC JOIN 
-        (SELECT d.department_id 부서아이디, d.location_id LOC
-            FROM employees e ,DEPARTMENTS d
-            WHERE e.department_id = d.department_id 
+    (SELECT d.department_id, d.location_id LOC FROM employees e ,DEPARTMENTS d
+        WHERE e.department_id = d.department_id 
             AND first_name = 'Steven' AND last_name = 'King') D
 ON LOC.location_id = D.LOC;
+
+--3) teacher's code 다른 방법 SUBQUERY로 풀 경우 
+SELECT location_id 도시아이디 , street_address 거리명 , postal_code 우편번호 , 
+        city 도시명 , state_province 주, country_id 나라아이디 
+FROM locations
+WHERE location_id = (SELECT location_id FROM departments 
+                        WHERE department_id = (SELECT department_id FROM employees
+                                                WHERE first_name = 'Steven' AND last_name = 'King'));
+                                                  
+-- 4) teacher's code join으로 풀 경우
+SELECT location_id 도시아이디 , street_address 거리명 , postal_code 우편번호 , 
+        city 도시명 , state_province 주, country_id 나라아이디 
+FROM locations NATURAL JOIN DEPARTMENTS JOIN EMPLOYEES 
+ON EMPLOYEES.DEPARTMENT_ID = DEPARTMENTS.DEPARTMENT_ID 
+WHERE FIRST_NAME = 'Steven' AND LAST_NAME = 'King';
+
+
 
 
 
@@ -48,13 +67,21 @@ ON LOC.location_id = D.LOC;
 --급여의 내림차순으로 출력하세요 -ANY연산자 사용(74건)
 
 --job_id가 'ST_MAN'인 직원의 급여
-SELECT job_id 사번, first_name 직원명, salary 급여  
+SELECT salary 급여  
 FROM employees WHERE job_id = 'ST_MAN';
 
---이 직원의 급여보다 작은 직원 목록
+-- 이 직원의 급여보다 작은 직원 목록
 SELECT job_id 사번, first_name 직원명, salary 급여 
 FROM employees 
-WHERE salary < ANY(SELECT salary 급여 FROM employees WHERE job_id = 'ST_MAN');
+WHERE salary < ANY(SELECT salary 급여 FROM employees WHERE job_id = 'ST_MAN')
+ORDER BY salary DESC;
+
+-- TEACHER'S CODE
+SELECT employee_id 사번아이디, first_name 직원명, salary 급여 FROM employees
+WHERE salary  < ANY(SELECT salary FROM employees WHERE job_id = 'ST_MAN')
+ORDER BY salary DESC;
+
+
 
 
 
@@ -62,23 +89,40 @@ WHERE salary < ANY(SELECT salary 급여 FROM employees WHERE job_id = 'ST_MAN');
 --직원번호(employee_id), 이름(first_name)과 급여(salary) 부서번호(department_id)를 조회하세요
 --단 조회결과는 급여의 내림차순으로 정렬되어 나타나야 합니다.
 --조건절비교, 테이블조인 2가지 방법으로 작성하세요
-
---각 부서별로 최고의 급여를 받는 사원 --101행
-SELECT MAX(salary), department_id ,first_name
-                FROM employee e , departments d 
-                WHERE e.department_id = d.department_id 
-                GROUP BY department_id, first_name;
                 
-SELECT employee_id 직원번호, first_name 이름, salary 급여, department_id 부서번호 
-FROM EMPLOYEES 
-WHERE salary = (SELECT MAX(salary), department_id ,first_name
-                FROM employee e , departments d 
-                WHERE e.department_id = d.department_id 
-                GROUP BY department_id,first_name);
-                
+-- TEACHER'S CODE------------------------------
+-- 부서별 최고 급여 쿼리 
+SELECT MAX(salary), department_id FROM employees
+GROUP BY department_id;
+
+--조건절 비교 방식 
+SELECT emp.employee_id 직원번호, emp.first_name 이름, emp.salary 급여, emp.department_id 부서번호 
+FROM employees emp
+WHERE (emp.department_id, emp.salary) IN(SELECT MAX(salary), department_id FROM employees
+                                            GROUP BY department_id)
+ORDER BY SALARY DESC;
+
+-- table join
+SELECT emp.employee_id 직원번호, emp.first_name 이름, emp.salary 급여, emp.department_id 부서번호 
+FROM employees emp 
+    JOIN (SELECT MAX(salary) salary , department_id FROM employees GROUP BY department_id) T
+     ON emp.department_id = T.department_id
+WHERE emp.salary = T.salary
+ORDER BY emp.salary DESC;
 
 
 
+
+/*
+문제6.
+각 업무(job) 별로 연봉(salary)의 총합을 구하고자 합니다.
+연봉 총합이 가장 높은 업무부터 업무명(job_title)과 연봉 총합을 조회하시오
+(19건)
+*/
+SELECT j.job_title, t.SUMSAL , j.job_id , t.job_id 
+FROM jobs j JOIN (SELECT job_id, SUM(salary) SUMSAL FROM employees GROUP BY job_id) t
+            ON j.job_id = t.job_id 
+ORDER BY SUMSAL DESC;
 
 
 
