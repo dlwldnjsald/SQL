@@ -65,11 +65,11 @@ SELECT * FROM DBA_USERS;
 
 
 
--- 만일 시나리오: HR스키마의 EMPLOYEES 테이블 조회 권환을 HIMEDIA에게 부여하고자 한다면
+---- 만일 시나리오: HR스키마의 EMPLOYEES 테이블 조회 권환을 HIMEDIA에게 부여하고자 한다면
 -- HR 스키마의 오너(주인)은 HR -> HR로 접속후 수행해보기 
 GRANT SELECT ON employees TO himedia; --Grant을(를) 성공했습니다.로 출력됨
 
---> 다시 himedia 계정으로 변경후 실행
+--> 다시 himedia 계정으로 변경후  실행 // (스키마->사용자)
 SELECT * FROM HR.employees; 
 -- HR 스키마 안쪽의 EMPLOYEES TABLE의 셀렉트 권한을 HIMEDIA 에게 부여한 값
 SELECT * FROM HR.DEPARTMENTS; --테이블 또는 뷰가 존재하지 않습니다 로 뜨게됨
@@ -77,11 +77,42 @@ SELECT * FROM HR.DEPARTMENTS; --테이블 또는 뷰가 존재하지 않습니�
 
 
 
+--------------------------
+-- DDL
+--------------------------
+-- 스키마 내의 모든 테이블을 확인
+SELECT * FROM tabs; --tabs : table 정보 dictionary
+
+---- 1번째 방법을 통한 테이블 생성
+-- 테이블 생성 : CREATE TABLE --> BOOK 테이블 생성하기 --Table BOOK이(가) 생성되었습니다.
+CREATE TABLE book (book_id NUMBER(5), 
+                    title VARCHAR2(50), 
+                    author VARCHAR2(10), 
+                    pub_date DATE DEFAULT SYSDATE);
+                    --> 아직 여기다 제약조건은 안넣음 나중에 할 예정..
+-- 테이블 정보확인 
+DESC book;
 
 
+---- 2번째 방법을 통한 테이블 생성 : SUBQUERY를 이용한 테이블 생성
+SELECT * FROM HR.employees;
+
+-- hr.employees 테이블에서 job_id가 it 관련된 직원의 목록으로 새 테이블 생성을 원할경우,
+SELECT * FROM HR.employees WHERE job_id LIKE 'IT_%';                          -->먼저 뽑아내기
+CREATE TABLE emp_it AS 
+            (SELECT * FROM HR.employees WHERE job_id LIKE 'IT_%'); --Table EMP_IT이(가) 생성되었습니다-
+
+--> NOT NULL 제약조건만 물려받는다는것을 확인할 수 있음             
+SELECT * FROM tabs;
+DESC EMP_IT;
 
 
+---- 테이블 삭제 
+DROP TABLE emp_it; --Table EMP_IT이(가) 삭제되었습니다.
+SELECT * FROM tabs; --> 삭제된것 확인 가능
 
+
+DESC BOOK;
 
 
 
