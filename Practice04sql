@@ -12,23 +12,12 @@ WHERE salary < ALL (SELECT AVG(salary) FROM employees);
 --직원번호(employee_id), 이름(first_name), 급여(salary), 평균급여, 최대급여를 
 --급여의 오름차순으로 정렬하여 출력하세요(51건)
 
---> 서브쿼리의 방법으로 작성해보기
--- 평균급여 이상의 월급을 받는 사원의 목록 구하기
--- 1)평균급여값 구하기
-SELECT ROUND(AVG(salary),2) FROM employees; -- 6461.83
--- 2) 위 값의 6461.83 값 대신에 위 코드 커리 대입해서 작성
-SELECT first_name 직원명, salary 평균급여이상 
-FROM employees 
-WHERE salary >= (SELECT ROUND(AVG(salary),2) FROM employees);
-
--- 최대급여 이하의 월급을 받는 사원의 목록구하기
--- 3)최대급여값 구하기 
-SELECT MAX(salary)최대급여 FROM employees; --24000
--- 4) 위 (3) 값의 커리 2)에다 추가해서 대입하면 최종 코드 완성
-SELECT first_name 직원명, salary 평균급여이상, salary 최대급여이하-->추가
-FROM Employees
-WHERE salary >= (SELECT AVG(salary) FROM employees)
-        AND salary <= (SELECT MAX(salary) FROM employees) -->and로 추가
+-->TEACHER'S CODE
+SELECT EMP.employee_id, EMP.first_name, EMP.salary,
+        T. AVGSalary, T. MAXSalary
+FROM employees EMP 
+    JOIN (SELECT ROUND(AVG(salary)) AVGSalary, MAX(salary) MAXSalary FROM employees) T
+        ON EMP.salary BETWEEN T. AVGSalary AND T. MAXSalary
 ORDER BY salary;
 
 
@@ -47,10 +36,10 @@ WHERE e.department_id = d.department_id AND e.first_name = 'Steven' AND e.last_n
 SELECT LOC.location_id 도시아이디 , LOC.street_address 거리명 , LOC.postal_code 우편번호 , 
         LOC.city 도시명 ,LOC.state_province 주, LOC.country_id 나라아이디
 FROM locations LOC JOIN 
-        (SELECT e.first_name 이름, e.last_name 성, d.department_id 부서아이디, d.location_id LOC
+        (SELECT d.department_id 부서아이디, d.location_id LOC
             FROM employees e ,DEPARTMENTS d
             WHERE e.department_id = d.department_id 
-            AND e.first_name = 'Steven' AND e.last_name = 'King') D
+            AND first_name = 'Steven' AND last_name = 'King') D
 ON LOC.location_id = D.LOC;
 
 
@@ -75,8 +64,18 @@ WHERE salary < ANY(SELECT salary 급여 FROM employees WHERE job_id = 'ST_MAN');
 --조건절비교, 테이블조인 2가지 방법으로 작성하세요
 
 --각 부서별로 최고의 급여를 받는 사원 --101행
+SELECT MAX(salary), department_id ,first_name
+                FROM employee e , departments d 
+                WHERE e.department_id = d.department_id 
+                GROUP BY department_id, first_name;
+                
 SELECT employee_id 직원번호, first_name 이름, salary 급여, department_id 부서번호 
-FROM EMPLOYEES
+FROM EMPLOYEES 
+WHERE salary = (SELECT MAX(salary), department_id ,first_name
+                FROM employee e , departments d 
+                WHERE e.department_id = d.department_id 
+                GROUP BY department_id,first_name);
+                
 
 
 
