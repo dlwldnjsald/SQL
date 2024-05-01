@@ -407,7 +407,7 @@ WHERE department_id = 110; --12008, 8300 출력
 --2. 1번쿼리 중 하나보다 많이 받는 직원목록 
 SELECT first_name, salary
 FROM employees 
-WHERE salary > ANY (12008,3800);
+WHERE salary > ANY (12008,8300);
 --3. (1)+(2)
 SELECT first_name, salary
 FROM employees 
