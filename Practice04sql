@@ -119,10 +119,69 @@ ORDER BY emp.salary DESC;
 연봉 총합이 가장 높은 업무부터 업무명(job_title)과 연봉 총합을 조회하시오
 (19건)
 */
+-- teacher's code
 SELECT j.job_title, t.SUMSAL , j.job_id , t.job_id 
 FROM jobs j JOIN (SELECT job_id, SUM(salary) SUMSAL FROM employees GROUP BY job_id) t
             ON j.job_id = t.job_id 
 ORDER BY SUMSAL DESC;
+
+
+
+
+/*
+문제7.
+자신의 부서 평균 급여보다 월급(salary)이 많은 직원의 직원번호(employee_id), 이름
+(first_name)과 급여(salary)을 조회하세요
+(38건)
+*/
+-- teacher's code
+SELECT emp.employee_id, emp.first_name, emp.salary 
+FROM employees emp JOIN (SELECT department_id, AVG(salary) salary FROM employees
+                        GROUP BY department_id ) t
+                    ON emp.department_id = t.department_id
+WHERE emp.salary > t.salary;
+
+
+
+
+/*
+문제8.
+직원 입사일이 11번째에서 15번째의 직원의 
+사번, 이름, 급여, 입사일을 입사일 순서로 출력하세요
+*/
+-- teacher's code
+-- 1)직원 입사일 ORDERBY 해서 먼저 정렬 필요 
+SELECT employee_id, first_name, salary, hire_date FROM employees 
+ORDER BY HIRE_DATE;
+--2) 위 코드를 ROWNUM 으로 정렬해주고 위 코드를 서브 쿼리로 묶어주기 
+SELECT rownum RN, employee_id, first_name, salary, hire_date 
+    FROM (SELECT employee_id, first_name, salary, hire_date FROM employees ORDER BY HIRE_DATE);
+--3) 조건 부여하기 
+SELECT employee_id, first_name, salary, hire_date
+FROM (SELECT rownum RN, employee_id, first_name, salary, hire_date 
+    FROM (SELECT employee_id, first_name, salary, hire_date FROM employees ORDER BY HIRE_DATE))
+WHERE RN >= 11 AND RN <= 15;
+
+-- row_number 함수 사용 
+-- 1)row num 사용해서 먼저 정렬해주기
+SELECT ROW_NUMBER() OVER (ORDER BY hire_date) rnum,
+        employee_id, first_name, salary, hire_date FROM employees;
+-- 2)위 코드를 서브쿼리로 해서 컬럼 출력 및 조건 추가        
+SELECT rnum , employee_id, first_name, salary, hire_date 
+FROM (SELECT ROW_NUMBER() OVER (ORDER BY hire_date) rnum,
+        employee_id, first_name, salary, hire_date FROM employees)
+WHERE rnum >= 11 AND rnum <= 15;
+
+-- rank 함수 사용
+-- 1)rank()함수 사용해서 먼저 정렬해주기
+SELECT RANK() OVER (ORDER BY hire_date ASC) rank,
+        employee_id, first_name, salary, hire_date FROM employees;
+-- 2)위 코드를 서브쿼리로 해서 컬럼 출력 및 조건 추가        
+SELECT rank, employee_id, first_name, salary, hire_date
+FROM (SELECT RANK() OVER (ORDER BY hire_date ASC) rank,
+        employee_id, first_name, salary, hire_date FROM employees) 
+WHERE rank BETWEEN 11 AND 15;
+            
 
 
 
