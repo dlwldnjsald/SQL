@@ -287,7 +287,7 @@ COMMIT; --커밋 완료.
 -->SELECT * FROM AUTHOR; -- CMD라인으로 가서 확인해줄경우 레코드를 확인할수 있음 
 
 
----- UPDATE 
+---- UPDATE WHERE 
 -- 특정 레코드의 컬럼 값을 변경한다
 -- WHERE 절이 없으면 모든 레코드가 변경되는 위험 있다
 -- 가급적 WHERE 절로 변경하고자 하는 레코드를 지정하도록 한다
@@ -306,4 +306,32 @@ COMMIT;                            --커밋 완료. -- 확인 후 COMMIT으로 �
 --> 업데이트 후 커밋으로 최종 반영했을때 CMD 라인에서도 확인해보면 변경된것 확인 가능
 
 
+
+
+---- DELETE WHERE
+-- 테이블로부터 특정 레코드를 삭제
+-- WHERE 절이 없으면 모든 레코드 삭제 (주의)
+
+-- 연습>>
+-- 1)HR.employees 테이블을 기반으로 department_id가 10,20,30인 직원들만 새테이블 emp123으로 생성시
+CREATE TABLE emp123 AS (SELECT * FROM HR.employees 
+                        WHERE department_id IN(10,20,30)); --Table EMP123이(가) 생성되었습니다.
+DESC emp123;
+SELECT first_name, salary, department_id FROM emp123; 
+--
+-- 2)부서가 30인 직원들의 급여를 10% 인상 
+UPDATE emp123 SET salary = salary + salary * 0.1 WHERE department_id = 30; --6개 행 이(가) 업데이트되었습니다.
+-- 확인
+SELECT * FROM emp123; 
+--
+-- 3)job_id가 MK_로 시작하는 직원들 삭제 할 경우
+DELETE FROM emp123 WHERE job_id LIKE 'MK_%';  --2개 행 이(가) 삭제되었습니다.
+-- 확인
+SELECT * FROM emp123; 
+--
+-- 4)WHERE 절이 생략된 DELETE 문은 모든 레코드를 삭제
+DELETE FROM emp123;    -- (주의하기) -->7개 행 이(가) 삭제되었습니다.
+SELECT * FROM emp123;  -- 전체가 삭제된것을 확인 가능 
+ROLLBACK;              -- 롤백 완료. 한번의 기회로 DELETE 문은 복구 가능 //롤백 가능 //TRUNCATE는 복구불가 롤백불가
+SELECT * FROM emp123;  -- 롤백 후 다시 복구된 값 확인 가능
 
