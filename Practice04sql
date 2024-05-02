@@ -18,7 +18,7 @@ SELECT EMP.employee_id, EMP.first_name, EMP.salary,
         T. AVGSalary, T. MAXSalary --CORRELATED
 FROM employees EMP  
     JOIN (SELECT ROUND(AVG(salary)) AVGSalary, MAX(salary) MAXSalary FROM employees) T --CORRELATED
-        ON EMP.salary BETWEEN T. AVGSalary AND T. MAXSalary  --> BETWEEN 함수로 편하게 사용
+     ON EMP.salary BETWEEN T. AVGSalary AND T. MAXSalary  --> BETWEEN 함수로 편하게 사용
 ORDER BY salary;
 -->CORRELATED관계..
 
