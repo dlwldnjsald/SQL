@@ -154,6 +154,58 @@ DESC BOOK;
 -- 0502
 -- DDL 이어서 공부 시작 >>
 
+----실습문제
+-- himedia 계정으로 실행>>
+-- 1)AUTHOR 테이블 생성하기 
+CREATE TABLE author ( author_id NUMBER(10), --> 여기서 PRIMARY KEY로 잡아도 되지만 
+                      author_name VARCHAR2(100) NOT NULL, -- not null은 컬럼 제약조건으로만 활용 가능
+                      author_desc VARCHAR2(500),
+                      PRIMARY KEY (author_id) --> 여기서 이렇게 PRIMARY KEY 로 명시해줘도 된다.
+                      --> 복합키의 경우 이 방법으로 해야할수 밖에 없음
+                      );  -->Table AUTHOR이(가) 생성되었습니다.
+--                      
+--author table 잘 생성되었는지 확인
+DESC author; 
+--
+-- 2)book 테이블의 author 컬럼 삭제하기
+-- 나중에 author_id 컬럼 추가 --> author. author_id 와 참조 연결할 예정
+--
+ALTER TABLE book DROP COLUMN author; -- Table BOOK이(가) 변경되었습니다.
+-- author 컬럼 삭제된것 확인
+DESC book; 
+--
+-- 3)book 테이블에 author_id 컬럼 추가
+-- author.author_id 를 참조하는 컬럼이기에 author.author_id 컬럼과 같은 형태여야 한다.
+ALTER TABLE book ADD (author_id NUMBER(10));  --Table BOOK이(가) 변경되었습니다.
+-- author_id 컬럼 추가된것 확인
+DESC book; 
+--
+--
+
+
+---- PK-FK 연결작업 하기 
+-- 두개의 테이블 내에서 author_id 컬럼 중복된것 확인  
+DESC book; --여기에 author_id(FK) 해주기
+DESC author;
+--
+-- book 테이블의 book_id도 author 테이블의 PK와 같은 데이터타입 (NUMBER(10))로 변경
+ALTER TABLE book MODIFY (book_id NUMBER(10)); --Table BOOK이(가) 변경되었습니다.
+DESC book; -->book_id가 (NUMBER(10))로 변경된것 확인
+--
+-- book 테이블의 book_id 컬럼에 primary key (PK)제약조건을 부여
+ALTER TABLE book ADD CONSTRAINT pk_book_id PRIMARY KEY (book_id); --Table BOOK이(가) 변경되었습니다.//PK설정함
+DESC book; 
+--
+-- book 테이블의 author_id 컬럼과 author 테이블의 author_id를 FK로 연결
+ALTER TABLE book ADD CONSTRAINT fk_author_id FOREIGN KEY (author_id) 
+                    REFERENCES author(author_id); --author 테이블의 author_id와 연결
+                    --Table BOOK이(가) 변경되었습니다.
+
+
+
+
+
+
 
 
 
