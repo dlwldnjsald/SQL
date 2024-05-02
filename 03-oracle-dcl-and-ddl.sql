@@ -335,3 +335,47 @@ SELECT * FROM emp123;  -- 전체가 삭제된것을 확인 가능
 ROLLBACK;              -- 롤백 완료. 한번의 기회로 DELETE 문은 복구 가능 //롤백 가능 //TRUNCATE는 복구불가 롤백불가
 SELECT * FROM emp123;  -- 롤백 후 다시 복구된 값 확인 가능
 
+
+
+-------------------------
+-- TRANSACTION
+-------------------------
+
+-- 트랜잭션 테스트 테이블 
+CREATE TABLE t_test ( log_text VARCHAR2(100)); --Table T_TEST이(가) 생성되었습니다.
+
+-- 첫 번째 DML이 수행된 시점에서 transaction
+INSERT INTO  t_test VALUES('트랜젝션 시작'); --1 행 이(가) 삽입되었습니다.
+SELECT * FROM t_test; -- 추가된 행 확인
+--> cmd라인에SELECT * FROM t_test; 입력해도 
+--  레코드가 안뜨고 선택된 레코드가 없습니다.로 출력될것임 
+INSERT INTO T_TEST VALUES ('데이터 INSERT'); --1 행 이(가) 삽입되었습니다.
+SELECT * FROM t_test;-- 추가된 행 확인
+--
+--세이브 포인트 설정 sp1 생성
+SAVEPOINT sp1; --Savepoint이(가) 생성되었습니다. 
+--
+INSERT INTO t_test VALUES('데이터 2 INSERT'); --1 행 이(가) 삽입되었습니다.
+SELECT * FROM t_test;-- 추가된 행 확인
+--
+--세이브 포인트 설정 sp2 생성
+SAVEPOINT sp2; --Savepoint이(가) 생성되었습니다.
+--
+UPDATE t_test SET log_text = '업데이트'; --3개 행 이(가) 업데이트되었습니다.
+SELECT * FROM t_test;-- 추가된 행 확인 
+-- 위에서 where 안써서 모든 레코드가 '업데이트'로 되버림 확인 
+--
+-- 다시 롤백 하고 싶을 경우 
+-- sp1 로 귀환하기
+ROLLBACK TO sp1; --롤백 완료.
+SELECT * FROM t_test;-- 롤백후 변경된 행 확인 
+--
+INSERT INTO t_test VALUES('데이터 3 INSERT'); --1 행 이(가) 삽입되었습니다.
+SELECT * FROM t_test;
+--> cmd로 가서 SELECT * FROM t_test; 입력해도 아직 커밋이 안되어서 레코드무로 뜸
+--
+-- 반영 : commit or 취소: rollback
+-- 명시적으로 트랜잭션 종료
+COMMIT; --커밋 완료.
+SELECT * FROM t_test; 
+--> CMD로 가서 SELECT * FROM t_test; 입력후 확인한경우 레코드값 확인 가능 
