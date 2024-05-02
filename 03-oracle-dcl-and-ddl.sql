@@ -179,8 +179,7 @@ DESC book;
 ALTER TABLE book ADD (author_id NUMBER(10));  --Table BOOK이(가) 변경되었습니다.
 -- author_id 컬럼 추가된것 확인
 DESC book; 
---
---
+
 
 
 ---- PK-FK 연결작업 하기 
@@ -202,9 +201,41 @@ ALTER TABLE book ADD CONSTRAINT fk_author_id FOREIGN KEY (author_id)
                     --Table BOOK이(가) 변경되었습니다.
 
 
+---- DATA DICTIONARY 
+-- :오라클이 관리하는 모든정보를 저장하는 카탈로그 테이블로 BASE-TABLE과 VIEW로 구성됨
+
+-- USER_ : 현재 로그인된 사용자에게 허용된 뷰
+-- ALL_ : 모든 사용자 뷰
+-- DBA_ : DBA에게 허용된 뷰 
+
+-- 모든 DICTIONARY 정보 확인
+SELECT * FROM DICTIONARY; -- DBA가 아니라서 아마 DBA_는 확인되지 않을것
+--
+-- 사용자 스키마 객체 : USER_OBJECTS
+SELECT * FROM USER_OBJECTS; 
+--
+-- 사용자 스키마의 이름과 타입 정보 출력 
+SELECT OBJECT_NAME, OBJECT_TYPE FROM USER_OBJECTS;
+--
+-- 제약조건의 확인
+SELECT * FROM USER_CONSTRAINTS;
+SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE, SEARCH_CONDITION, TABLE_NAME FROM USER_CONSTRAINTS;
+--
+-- BOOK 테이블에 적용된 제약조건의 확인
+SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE, SEARCH_CONDITION FROM USER_CONSTRAINTS 
+                                                    WHERE TABLE_NAME = 'BOOK';
 
 
 
+------------------------------------------
+-- DML (DATA MANIPULATION LANGUAGE) -> CRUD 
+------------------------------------------
+--DML DATA MANIPULATION LANGUAGE (조작기능)
+    -- 생성 CREATE --> "INSERT"문
+    -- 조회 RETRIEVE OR READ --> "SELECT"문
+    -- 갱신 UPDATE --> "UPDATE"문
+    -- 삭제 DELETE --> "DELETE"문
+    
 
 
 
