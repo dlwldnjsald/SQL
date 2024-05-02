@@ -235,8 +235,75 @@ SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE, SEARCH_CONDITION FROM USER_CONSTRAINTS
     -- 조회 RETRIEVE OR READ --> "SELECT"문
     -- 갱신 UPDATE --> "UPDATE"문
     -- 삭제 DELETE --> "DELETE"문
-    
 
+
+---- INSERT : 테이블에 새 레코드 (튜플) 추가
+-- 제공된 컬럼 목록의 순서와 타입, 값 목록의 순서와 타입이 일치해야
+-- 컬럼 목록을 제공하지 않으면 테이블생성시 정의된 컬럼의 순서와 타입을 따르기에 이에 맞게 값지정해줘야 한다
+--
+DESC author; --로 author 테이블에 구성된 컬럼명, 타입들을 확인 해준다
+--
+-- 1)컬럼 목록이 제시되지 않았을 경우 INSERT 방법
+INSERT INTO author 
+VALUES(1, '박경리', '토지 작가');                   --1 행 이(가) 삽입되었습니다.
+-- 삽입된 행 확인
+SELECT * FROM AUTHOR;
+--
+-- 2)컬럼 목록을 제시했을때 INSERT 방법
+-- 제시한 컬럼의 순서와 타입대로 값 목록을 제공해야 함
+INSERT INTO author (author_id, author_name)
+VALUES(2, '김영하');                               --1 행 이(가) 삽입되었습니다.
+-- 삽입된 행 확인
+SELECT * FROM AUTHOR;
+--
+-- 3)컬럼 목록을 (원하는 순서대로 정렬) 제공했을때,
+-- 테이블 생성시 정의된 컬럼의 순서와 상관 없이 데이터 제공 가능 
+INSERT INTO author (author_name, author_id, author_desc)
+VALUES('류츠신', 3, '삼체 작가');                   --1 행 이(가) 삽입되었습니다.
+-- 삽입된 행 확인
+SELECT * FROM AUTHOR;
+--
+-- 이후에 cmd로 가서 
+--sqlplus himedia/himedia 접속후
+--select* from author -> 선택된 레코드가 없습니다.로 뜨게 됨 
+--이유?? dml ->insert, update, delete는 트랜젝션의 대상이기 때문? 
+-->아직 세션에서 트랜젝션이 시작된 후 아직 트랜젝션이 안끝난 상황 
+-->실제 데이터 베이스에 아직 적용된 상황이 아님  그래서 아직 레코드를 읽을 수 없다고 뜸
+--
+--1)Rollback 하는 경우
+--위에 추가한 레코드들을 반영 취소할 경우 롤백
+ROLLBACK; --롤백 완료. --> 반영 취소의 의미 
+SELECT * FROM author; -- 레코드들 rollback 되서 삭제된것을 알수 있음
+--
+--2)반영하는 경우 
+-- 다시 insert문으로 생성해주기 
+INSERT INTO author VALUES(1,'박경리','토지 작가');
+INSERT INTO author (author_id, author_name) VALUES(2,'김영하');
+INSERT INTO author (author_name, author_id, author_desc) VALUES ('류츠신', 3, '삼체작가');
+SELECT * FROM author; --생성된것 확인
+--
+-- 변경사항 반영하는 경우 커밋 
+COMMIT; --커밋 완료.
+-->SELECT * FROM AUTHOR; -- CMD라인으로 가서 확인해줄경우 레코드를 확인할수 있음 
+
+
+---- UPDATE 
+-- 특정 레코드의 컬럼 값을 변경한다
+-- WHERE 절이 없으면 모든 레코드가 변경되는 위험 있다
+-- 가급적 WHERE 절로 변경하고자 하는 레코드를 지정하도록 한다
+UPDATE author
+SET author_desc = '알쓸신잡 출연';                --3개 행 이(가) 업데이트되었습니다.
+--
+SELECT * FROM author; --author_desc 데이터값이 다 알쓸신잡 출연으로 바뀌어버린 해프닝 
+ROLLBACK;                                   -- 당황하지 말고 다시 롤백으로 반영 취소
+SELECT * FROM author;                               -- 확인해보면 정상으로 돌아옴..
+--
+UPDATE author 
+SET author_desc = '알쓸신잡 출연'
+WHERE author_name = '김영하';                       --1 행 이(가) 업데이트되었습니다.
+SELECT * FROM author;                            -- 변경된 값 확인(꼭 확인하는 습관)  
+COMMIT;                            --커밋 완료. -- 확인 후 COMMIT으로 변경된 값 반영
+--> 업데이트 후 커밋으로 최종 반영했을때 CMD 라인에서도 확인해보면 변경된것 확인 가능
 
 
 
