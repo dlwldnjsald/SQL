@@ -189,6 +189,7 @@ DESC author;
 --
 -- book 테이블의 book_id도 author 테이블의 PK와 같은 데이터타입 (NUMBER(10))로 변경
 ALTER TABLE book MODIFY (book_id NUMBER(10)); --"Table BOOK이(가) 변경되었습니다."
+-- MODIFY 는 열의 데이터유형을 변경할때 사용됨
 DESC book; -->book_id가 (NUMBER(10))로 변경된것 확인
 --
 -- book 테이블의 book_id 컬럼에 primary key (PK)제약조건을 부여
