@@ -88,14 +88,30 @@ DROP VIEW emp_detail; --"View EMP_DETAIL이(가) 삭제되었습니다.
 SELECT * FROM EMP_DETAIL; --"테이블 또는 뷰가 존재하지 않습니다
 
 
-
-
-
-
-
-
-
-
+-------------------------
+---- INDEX
+-------------------------
+-- SYSTEM 계정으로 >>
+-- hr.employees 테이블을 복사해서 s_emp 테이블 생성하기
+CREATE TABLE s_emp AS SELECT * FROM HR.employees; --"Table S_EMP이(가) 생성되었습니다.
+DESC s_emp; 
+SELECT * FROM s_emp;
+--
+-- s_emp 테이블에 employee_id에 UNIQUE INDEX 걸오봄
+CREATE UNIQUE INDEX s_emp_id_pk
+ON s_emp (employee_id); --"INDEX S_EMP_ID_PK이(가) 생성되었습니다.
+--
+-- 사용자가 가지고있는 인덱스 확인
+SELECT * FROM USER_INDEXES;
+-- 어느 인덱스가 어느 컬럼에 걸려 있는지 확인 
+SELECT * FROM USER_IND_COLUMNS;
+--
+-- 어느 인덱스 어느 컬럼에 걸려 있는지 TABLE JOIN해서 알아보기
+SELECT 
+    t.INDEX_NAME, t.TABLE_NAME, c.COLUMN_NAME, c.COLUMN_POSITION
+FROM USER_INDEXES t JOIN USER_IND_COLUMNS c 
+    ON t.INDEX_NAME = c.INDEX_NAME
+WHERE t.TABLE_NAME = 'S_EMP';
 
 
 
