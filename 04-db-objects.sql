@@ -88,10 +88,12 @@ DROP VIEW emp_detail; --"View EMP_DETAIL이(가) 삭제되었습니다.
 SELECT * FROM EMP_DETAIL; --"테이블 또는 뷰가 존재하지 않습니다
 
 
+
+
 -------------------------
 ---- INDEX
 -------------------------
--- SYSTEM 계정으로 >>
+-- himedia 계정으로 다시 진행>>
 -- hr.employees 테이블을 복사해서 s_emp 테이블 생성하기
 CREATE TABLE s_emp AS SELECT * FROM HR.employees; --"Table S_EMP이(가) 생성되었습니다.
 DESC s_emp; 
@@ -117,17 +119,55 @@ WHERE t.TABLE_NAME = 'S_EMP';
 
 
 
+-------------------------
+---- SEQUENCE
+-------------------------
+--author 테이블 확인해보기
+SELECT * FROM author;
+
+-- 새로운 특정 레코드 추가하고자 할때 겹치지 않는 유일한 pk가 필요
+INSERT INTO author (author_id, author_name)
+VALUES ((SELECT MAX(author_id)+ 1 FROM author), '이문열'); -- "1 행 이(가) 삽입되었습니다.
+
+SELECT * FROM author;
+ROLLBACK;
+-- 사용자가 많아지면 충돌 될 우려 있어서 위의 코드는 추천하지 않는다 그래서 사용할수 있는 시퀀스
+---- 순차 객체 SEQUENCE 생성
+CREATE SEQUENCE seq_author_id 
+        START WITH 4 INCREMENT BY 1 MAXVALUE 1000000; --"Sequence SEQ_AUTHOR_ID이(가) 생성되었습니다.
+-- PK는 SEQUENCE 객체로부터 생성
+INSERT INTO author(author_id, author_name, author_desc)
+        VALUES(seq_author_id.NEXTVAL, '스티븐 킹', '쇼생크 탈출');-- "1 행 이(가) 삽입되었습니다.
+SELECT * FROM author;
+--
+SELECT seq_author_id.CURRVAL FROM dual;
 
 
+---- 새 시퀀스 생성
+CREATE SEQUENCE my_seq START WITH 1 INCREMENT BY 1 MAXVALUE 10; --"Sequence MY_SEQ이(가) 생성되었습니다.
+--
+SELECT my_seq.NEXTVAL FROM dual; -- 다음 시퀀스 추출 가상 컬럼
+SELECT my_seq.CURRVAL FROM dual; -- 시퀀스의 현 상태 
+
+---- 시퀀스 수정
+ALTER SEQUENCE my_seq INCREMENT BY 2 MAXVALUE 1000000; --Sequence MY_SEQ이(가) 변경되었습니다.
+SELECT my_seq.CURRVAL FROM dual; -- 시퀀스의 현 상태 //3
+SELECT my_seq.NEXTVAL FROM dual; -- 다음 시퀀스 추출 가상 컬럼 //5
+--
+---- 시퀀스를 위한 딕셔너리
+SELECT * FROM USER_SEQUENCES;
+--
+SELECT * FROM USER_OBJECTS WHERE OBJECT_TYPE = 'SEQUENCE';
+--
+---- 시퀀스 삭제 
+DROP SEQUENCE my_seq; --"삭제됨
+SELECT * FROM USER_SEQUENCES;
 
 
+---- BOOK테이블 PK의 현재값 확인
+SELECT max(book_id) FROM book;
 
-
-
-
-
-
-
-
+CREATE SEQUENCE seq_book_id START WITH 3 INCREMENT BY 1 MAXVALUE 1000000 NOCACHE;
+--"Sequence SEQ_BOOK_ID이(가) 생성되었습니다.
 
 
