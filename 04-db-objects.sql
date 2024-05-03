@@ -32,7 +32,8 @@ CREATE or REPLACE VIEW emp10 AS SELECT employee_id, first_name, last_name, salar
 -- 실제 테이블이 생성된것은 아니지만                                
 SELECT * FROM tabs;
 --
--- 일반 테이블처럼 활용할 수 있음
+-- 일반 테이블처럼 활용할 수 있음 
+-- 심플 뷰는 간단한 뷰는 기본적으로 하나 이상의 원본 테이블로부터 데이터를 가져와 만들어지는 가상 테이블
 DESC emp10;
 --
 SELECT * FROM emp10;
@@ -50,8 +51,9 @@ SELECT * FROM emp10;
 CREATE OR REPLACE VIEW emp10 AS SELECT employee_id, first_name, last_name, salary
                                 FROM emp123 WHERE department_id = 10
                                 WITH READ ONLY; --"View EMP10이(가) 생성되었습니다."
--- 읽기 전용 뷰에서는 DML작업 수행 불가                                
-UPDATE emp10 SET salary = salary* 2;  --"읽기 전용 뷰에서는 DML 작업을 수행할 수 없습니다."라고 뜸   
+-- 읽기 전용 뷰에서(Read-only view)는 DML작업 수행 불가                                
+UPDATE emp10 SET salary = salary* 2;  
+--"읽기 전용 뷰에서는 DML 작업을 수행할 수 없습니다."라고 뜸   
 
 
 
@@ -93,13 +95,16 @@ SELECT * FROM EMP_DETAIL; --"테이블 또는 뷰가 존재하지 않습니다
 -------------------------
 ---- INDEX
 -------------------------
+--. 인덱스는 특정 열(또는 열의 조합)에 대한 정렬된 데이터 집합으로, 
+-- 이를 사용하여 데이터를 효율적으로 검색할 수 있음 
+
 -- himedia 계정으로 다시 진행>>
 -- hr.employees 테이블을 복사해서 s_emp 테이블 생성하기
 CREATE TABLE s_emp AS SELECT * FROM HR.employees; --"Table S_EMP이(가) 생성되었습니다.
 DESC s_emp; 
 SELECT * FROM s_emp;
 --
--- s_emp 테이블에 employee_id에 UNIQUE INDEX 걸오봄
+-- s_emp 테이블의 employee_id에 UNIQUE INDEX 걸어봄
 CREATE UNIQUE INDEX s_emp_id_pk
 ON s_emp (employee_id); --"INDEX S_EMP_ID_PK이(가) 생성되었습니다.
 --
