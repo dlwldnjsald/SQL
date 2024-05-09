@@ -55,3 +55,27 @@ GRANT ALL PRIVILEGES ON webdb.* TO 'dev'@'localhost';
 -- REVOKE ALL PRIVILEGES ON webdb.* TO 'dev'@'localhost'; 하면 됨
 
 
+-- 데이터 베이스 확인
+SHOW DATABASES;
+-- 사용할 데이터 베이스 선언
+USE webdb;
+-- 테이블 관리>> 
+-- 테이블 생성
+CREATE TABLE author (
+	author_id int PRIMARY KEY,
+    author_name VARCHAR(50) NOT NULL,
+    author_desc VARCHAR(500) 
+);
+
+SHOW TABLES;
+DESC author;
+-- 테이블 생성 정보 확인
+SHOW CREATE TABLE author;
+
+ 
+
+-- 테이블 내에 컬럼 추가 
+ALTER TABLE book ADD pubs VARCHAR(50)
+
+-- 제약 조건 NOTNULL
+
