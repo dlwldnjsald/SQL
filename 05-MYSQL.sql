@@ -16,6 +16,7 @@ SELECT VERSION(), CURRENT_DATE FROM dual;
 
 -- 특정 테이블의 데이터 조회
 SELECT * FROM actor;
+-- -----------------------------------
 
 -- 데이터베이스 생성/삭제>>
 -- webdb 데이터베이스 생성 
@@ -30,6 +31,7 @@ DROP DATABASE webdb;
 CREATE DATABASE webdb CHARSET utf8mb4
 	COLLATE utf8mb4_unicode_ci;
 SHOW DATABASES;
+-- -----------------------------------
 
 -- 사용자 관리>>
 -- 사용자 만들기 
@@ -38,6 +40,7 @@ CREATE USER 'dev'@'localhost' IDENTIFIED BY 'dev';
 -- ALTER USER 'dev'@'localhost' IDENTIFIED BY 'new_password';
 -- 사용자 삭제 
 -- DROP USER 'dev'@'localhost';
+-- ---------------------------------
 
 -- 권한>>
 -- 권한의 부여
@@ -49,6 +52,7 @@ CREATE USER 'dev'@'localhost' IDENTIFIED BY 'dev';
 GRANT ALL PRIVILEGES ON webdb.* TO 'dev'@'localhost'; 
 -- 권한 회수시
 -- REVOKE ALL PRIVILEGES ON webdb.* TO 'dev'@'localhost'; 하면 됨
+-- ----------------------------------
 
 -- 테이블 관리>> 
 -- 데이터 베이스 확인
@@ -79,6 +83,7 @@ CREATE TABLE book (
 ); 
 SHOW TABLES;
 DESC book;
+-- ---------------------------------------------
 
 -- INSERT UPDATE DELETE >> 
 -- INSERT :새로운 레코드 삽입
@@ -90,9 +95,11 @@ INSERT INTO author (author_id, author_name) -- author_desc는 널 허용한다�
 VALUES (2, '김영하');
 SELECT * FROM author; -- 목록확인
 
+-- AUTOCOMMIT 꺼주기>>----------------
 -- MySQL은 기본적으로 자동 커밋이 활성화
 -- autocommit을 비활성화 하기 위해선 autocommit 옵션을 0으로 설정해줘야 한다
 SET autocommit = 0;
+-- ---------------------------------
 
 -- MySQL은 명시적 트랜잭션을 수행한다
 START transaction;
@@ -108,6 +115,95 @@ WHERE author_id = 2;  -- where절 써줘야 함
 SELECT * FROM author; -- 확인
 -- ROLLBACK; -- 위의 커리 반영 취소할 경우,
 COMMIT; -- 변경 사항 영구 반영 
+-- ----------------------------------------------------
+
+-- AUTO_INCREMENT 속성>>
+-- 연속된 순차정보, 주로 PK속성에 사용된다
+-- author 테이블의 PK에 auto_increment 속성부여------
+ALTER TABLE author MODIFY author_id INT AUTO_INCREMENT PRIMARY KEY;
+-- 위의 코드가 MULTIPLE PRIMARY KEY DEFINED로 오류뜸 (중복있다는 소리) 
+-- 위의 오류 해결방법은 아래
+-- 1. FK 정보 확인
+SELECT * FROM information_schema.KEY_COLUMN_USAGE;
+SELECT constraint_name FROM information_schema.KEY_COLUMN_USAGE 
+WHERE table_name = 'book'; -- book 테이블 내의 fk 값 찾아보기
+-- 2. FK 삭제 : book 테이블의 FK(fk_book)삭제하기
+ALTER TABLE book DROP FOREIGN KEY fk_book;
+-- 3. author 테이블의 pk에 auto_increment 속성 붙이기 
+-- 기존 PK 삭제
+ALTER TABLE author DROP PRIMARY KEY;
+-- AUTO_INCREMENT 속성이 부여된 새로운 PK 생성
+ALTER TABLE author MODIFY author_id INT AUTO_INCREMENT PRIMARY KEY;
+-- 4. 삭제했던 FK-> 다시 book의 author_id에 FK 재연결 
+ALTER TABLE book 
+ADD CONSTRAINT fk_book FOREIGN KEY (author_id) 
+REFERENCES author(author_id);
+
+-- AUTO_COMMIT 을 다시 켜주기 -------------------
+SET autocommit = 1;
+-- 다시 자동으로 트랜잭션이 수행될것
+
+-- AUTO_INCREMENT -----------------------------
+-- AUTHOR TABLE 확인
+SELECT * FROM author;
+-- 1. 새로운 AUTO_INCREMENT 값 부여하기위해 PK 최댓값 구하기
+SELECT MAX(author_id) FROM author; -- 2 로 나옴
+-- 새로 생성되는 uteo_increment 시작값을 변경
+ALTER TABLE author AUTO_INCREMENT = 3; -- 3번부터 시작해야 함 
+-- 테이블 구조 확인
+DESC author;
+
+SELECT * FROM author;
+-- 작가 2명 데이터 더 추가 
+INSERT INTO author (author_name) VALUES ('스티븐 킹'); -- authordesc 는 굳이 입력 안해도 null값으로 나옴
+INSERT INTO author (author_name, author_desc) VALUES ('류츠신', '삼체 작가');
+SELECT * FROM author; 
+-- -------------------------------------------
+
+-- 2. 테이블 생성시 AUTO_INCREMENT 속성을 부여하는 방법 
+DROP TABLE book CASCADE; -- 기존의 book 테이블 삭제후 다시 생성해보기
+
+-- book 테이블 생성 (AUTO_INCREMENT 속성 부여)
+CREATE TABLE book ( 
+	book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    pubs VARCHAR(100),
+    pub_date DATETIME DEFAULT now(),
+    author_id int,
+    CONSTRAINT fk_book FOREIGN KEY (author_id)
+    REFERENCES author(author_id)
+);
+DESC book; 
+
+-- 데이터 입력해주기 
+INSERT INTO book (title, pub_date, author_id) VALUES ('토지', '1994-03-04', 1);
+INSERT INTO book (title, author_id) VALUES ('살인자의 기억법', 2);
+INSERT INTO book (title, author_id) VALUES ('쇼생크 탈출', 3);
+INSERT INTO book (title, author_id) VALUES ('삼체', 4);
+SELECT * FROM book;
+-- ------------------------------------------
+
+desc author;
+desc book;
+-- JOIN >>
+SELECT title 제목,  
+		pub_date 출판일, -- > book 테이블 내
+		author_name 저자명,
+        author_desc '저자 상세' -- > author 테이블 내
+FROM book b JOIN author a -- join
+ON b.author_id = a.author_id; 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
