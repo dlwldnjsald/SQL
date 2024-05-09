@@ -121,7 +121,9 @@ COMMIT; -- 변경 사항 영구 반영
 -- ----------------------------------------------------
 
 -- AUTO_INCREMENT 속성>>
--- 연속된 순차정보, 주로 PK속성에 사용된다
+-- 연속된 순차정보, MySQL이 해당 열에 대해 자동으로 값을 증가, 
+-- 주로 일련 번호나 고유한 식별자를 생성하는 데 사용 (주로 PK속성에 사용된다)
+
 -- author 테이블의 PK에 auto_increment 속성부여------
 ALTER TABLE author MODIFY author_id INT AUTO_INCREMENT PRIMARY KEY;
 -- 위의 코드가 MULTIPLE PRIMARY KEY DEFINED로 오류뜸 (중복있다는 소리) 
