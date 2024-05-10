@@ -1,9 +1,10 @@
+-- 0509
 -- MySQL은 사용자와 Database를 구분하는 DBMS 이다
--- 현재 내가 사용할수 있는 database가 어떤게 있는지 확인
+-- 현재 내가 접근할수 있는 database가 어떤게 있는지 확인
 SHOW DATABASES;
--- 사용하고자 하는 DATABASE 사용위해 선언
+-- 사용하고자 하는 특정 DATABASE 사용위해 선언 필요
 USE sakila;
--- 데이터베이스 내에 어떤 테이블이 있는지 확인
+-- 데이터베이스 내 어떤 테이블이 있는지 확인
 SHOW TABLES;
 -- 테이블 구조 확인 
 DESCRIBE actor;
@@ -187,7 +188,6 @@ INSERT INTO book (title, author_id) VALUES ('쇼생크 탈출', 3);
 INSERT INTO book (title, author_id) VALUES ('삼체', 4);
 SELECT * FROM book;
 -- ------------------------------------------
-
 desc author;
 desc book;
 -- JOIN >>
