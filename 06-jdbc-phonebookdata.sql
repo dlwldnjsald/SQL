@@ -23,3 +23,13 @@ FROM PHONE_BOOK
 ORDER BY id;
 
 COMMIT;
+
+-- 2.등록 문항에 추가 등록을 위한 시퀀스 작성 
+CREATE SEQUENCE seq_phonebook_id 
+        START WITH 6 INCREMENT BY 1 MAXVALUE 1000000;
+---- 시퀀스를 위한 딕셔너리
+SELECT * FROM USER_SEQUENCES;
+--drop 원할경우
+DROP SEQUENCE seq_phonebook_id;
+
+        
