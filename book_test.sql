@@ -51,6 +51,9 @@ CREATE TABLE AUTHOR (
 DESC AUTHOR;
 
 -- 시퀀스 객체를 이용하여 테이블 생성
+-- DEFAULT seq_book.NEXTVAL은 해당 열에 값을 지정하지 않을 경우 
+-- seq_book 시퀀스의 다음 값을 기본값으로 사용하도록 설정
+-- 따라서 새로운 책이 추가될 때마다 seq_book 시퀀스에서 다음 번호가 자동으로 할당
 CREATE TABLE BOOK (
     book_id NUMBER(10) DEFAULT seq_book.NEXTVAL,
     title VARCHAR(100),
