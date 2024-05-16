@@ -141,11 +141,12 @@ FROM BOOK;
 --(3)정렬은 책 제목을 내림차순으로 정렬합니다.
 SELECT * FROM BOOK ORDER BY title DESC;
 
--- 최종 출력물
-SELECT *, AUTHOR.author_id, AUTHOR.author_name, AUTHOR.author_desc
-FROM BOOK JOIN AUTHOR 
+-- 최종 출력물 -- I FORGOT LEFT OUTER JOIN,,
+SELECT BOOK.book_id, BOOK.title, BOOK.pubs, BOOK.pub_date, BOOK.author_id,
+         AUTHOR.author_id, AUTHOR.author_name, AUTHOR.author_desc
+FROM BOOK LEFT OUTER JOIN AUTHOR 
         ON BOOK.author_id = AUTHOR.author_id
-ORDER BY title DESC;
+ORDER BY BOOK.title DESC;
 
 -- [산출물]
 /*
