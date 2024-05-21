@@ -35,7 +35,7 @@ SELECT 3.14159 * 10 * 10 FROM dual;
 SELECT first_name, salary, salary*12 FROM employees;
 
 --아래에서 오류가 나는 원인: job_id는 문자열 데이터(VARCHAR2)이기 때문에 산술연산 불가함
-SELECT first_name, job_ id, job_id * 12 FROM employees;
+SELECT first_name, job_id, job_id * 12 FROM employees;
 DESC employees;
 
 
