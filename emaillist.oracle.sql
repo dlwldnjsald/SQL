@@ -14,7 +14,7 @@ CREATE SEQUENCE seq_emaillist_pk
     increment by 1;
     
 -- 데이터 입력
-INSERT INTO emaillist
+INSERT INTO seq_emaillist_pk
 VALUES (
     seq_emaillist_pk.nextval,
     '남',
@@ -29,3 +29,4 @@ select * from emaillist order by created_at desc;
 insert into emaillist (no, last_name, first_name, email) 
 values (seq_emaillist_pk.nextval, ?, ?, ?);
 
+DELETE FROM emaillist WHERE no=?;
