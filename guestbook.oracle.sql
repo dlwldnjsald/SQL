@@ -40,3 +40,4 @@ commit;
 DELETE FROM Guestbook 
 WHERE no=2;    
 
+SELECT * FROM guestbook ORDER BY reg_date DESC;
