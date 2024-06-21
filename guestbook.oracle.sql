@@ -1,43 +1,16 @@
-
-drop table guestbook;
-
-
 CREATE TABLE guestbook (
-  no        NUMBER,
-  name      VARCHAR2(80),
-  password  VARCHAR2(20),
-  content   VARCHAR2(2000),
-  reg_date  DATE default sysdate,
-  PRIMARY KEY(no)
+	no number primary key,
+    name varchar(20) NOT NULL,
+    password varchar(20) NOT NULL,
+    content varchar(255) NOT NULL,
+    regdate date DEFAULT sysdate
 );
 
-CREATE SEQUENCE seq_guestbook_no
-INCREMENT BY 1 
-START WITH 1 ;
+CREATE SEQUENCE seq_guestbook_no 
+    START WITH 1 INCREMENT BY 1 NOCACHE;
 
-INSERT INTO guestbook
-VALUES (
-    seq_guestbook_no.nextval,
-    '홍길동',
-    '홍길동',
-    '첫번째글입니다', 
-    '2018-01-15');
-    
+insert into guestbook (no, name, password, content)
+values (seq_guestbook_no.NEXTVAL, '방문자', 'test', '테스트 방명록입니다.');
 
-INSERT INTO guestbook
-VALUES (
-    seq_guestbook_no.nextval,
-    '장길산',
-    '장길산',
-    '두번째글입니다', 
-    '2018-01-15');    
-
-
-select * from guestbook;
+SELECT no, name, password, content FROM guestbook ORDER BY regdate DESC;
 commit;
-
-    
-DELETE FROM Guestbook 
-WHERE no=2;    
-
-SELECT * FROM guestbook ORDER BY reg_date DESC;
