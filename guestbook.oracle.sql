@@ -14,3 +14,5 @@ values (seq_guestbook_no.NEXTVAL, '방문자', 'test', '테스트 방명록입�
 
 SELECT no, name, password, content FROM guestbook ORDER BY regdate DESC;
 commit;
+
+desc guestbook;
