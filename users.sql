@@ -14,3 +14,8 @@ CREATE SEQUENCE seq_users_pk
     START WITH 1 INCREMENT BY 1 NOCACHE;
     
     desc users;
+    desc guestbook
+    
+
+
+
