@@ -1,3 +1,6 @@
+desc guestbook;
+drop table guestbook;
+
 CREATE TABLE guestbook (
 	no number primary key,
     name varchar(20) NOT NULL,
