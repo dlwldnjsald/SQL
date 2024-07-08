@@ -209,6 +209,3 @@ ON b.author_id = a.author_id;
 
 
 
-
-
-
