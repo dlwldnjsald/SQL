@@ -10,7 +10,8 @@ primary key(no)
 )
 
 select * from users
-delete from users where no =2
+
+
 
 -- guestbook
 create table guestbook (
@@ -18,7 +19,7 @@ create table guestbook (
 	name varchar(20) NOT NULL,
     password varchar(20) NOT NULL,
     content varchar(255) NOT NULL,
-    regdate datetime DEFAULT now(),
+    reg_date datetime DEFAULT now(),
     primary key(no)
     )
     
